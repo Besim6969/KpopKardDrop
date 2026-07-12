@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KpopKardDrop — Ma Collection</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:#050508;--deep:#0a0a12;--card-bg:#0f0f1c;--card-bg2:#13131f;
+    --neon-pink:#ff2d78;--neon-cyan:#00f5ff;--neon-gold:#ffd700;--neon-purple:#c77dff;
+    --common:#a0aec0;--rare:#63b3ed;--mythic:#c77dff;--legendary:#ffd700;
+    --text:#e8e8f0;--subtext:#6a6a90;--border:rgba(255,255,255,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--black);color:var(--text);font-family:'Noto Sans KR',sans-serif;overflow-x:hidden;min-height:100vh}
+  .bg-grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(255,45,120,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,45,120,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+  .bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 50% 35% at 15% 5%,rgba(255,45,120,0.1) 0%,transparent 70%),radial-gradient(ellipse 40% 30% at 85% 85%,rgba(0,245,255,0.07) 0%,transparent 70%)}
+
+  /* ── SIDEBAR NAV ── */
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:rgba(8,8,14,0.95);backdrop-filter:blur(20px);border-right:1px solid var(--border);z-index:100;display:flex;flex-direction:column;padding:28px 0}
+  .sidebar-logo{padding:0 24px 32px;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.1em;background:linear-gradient(90deg,var(--neon-pink),var(--neon-cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .sidebar-logo span{background:linear-gradient(90deg,var(--neon-cyan),var(--neon-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .nav-section-label{padding:0 24px 8px;font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--subtext)}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:11px 24px;color:var(--subtext);text-decoration:none;font-size:0.82rem;letter-spacing:0.05em;transition:all 0.2s;position:relative;cursor:pointer}
+  .nav-item:hover{color:var(--text);background:rgba(255,255,255,0.04)}
+  .nav-item.active{color:#fff;background:rgba(255,45,120,0.1)}
+  .nav-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--neon-pink)}
+  .nav-item .ni{font-size:1rem;width:20px;text-align:center}
+  .sidebar-footer{margin-top:auto;padding:16px 24px;border-top:1px solid var(--border)}
+  .user-chip{display:flex;align-items:center;gap:10px}
+  .user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--neon-pink),var(--neon-purple));display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:#000;flex-shrink:0}
+  .user-name{font-size:0.8rem;color:var(--text)}
+  .user-rank{font-size:0.65rem;color:var(--subtext)}
+  .nav-divider{height:1px;background:var(--border);margin:12px 0}
+
+  /* ── MAIN ── */
+  .main{margin-left:220px;padding:40px 40px 80px;position:relative;z-index:1;min-height:100vh}
+
+  /* ── HEADER ── */
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:40px;animation:fadeUp 0.5s ease both}
+  .page-title-block{}
+  .page-eyebrow{font-size:0.65rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--neon-pink);margin-bottom:6px}
+  .page-title{font-family:'Black Han Sans',sans-serif;font-size:2.4rem;line-height:1;background:linear-gradient(135deg,#fff,rgba(255,255,255,0.6));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .header-actions{display:flex;gap:10px;align-items:center}
+  .btn-sm{padding:9px 20px;font-family:'Noto Sans KR',sans-serif;font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border-radius:6px}
+  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--subtext)}
+  .btn-outline:hover{border-color:var(--neon-cyan);color:var(--neon-cyan)}
+  .btn-pink{background:linear-gradient(135deg,var(--neon-pink),#ff6eb4);color:#000;font-weight:700;border:none;box-shadow:0 0 20px rgba(255,45,120,0.3)}
+  .btn-pink:hover{box-shadow:0 0 30px rgba(255,45,120,0.5);transform:translateY(-1px)}
+
+  /* ── PROGRESS OVERVIEW ── */
+  .progress-overview{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:36px;animation:fadeUp 0.5s 0.05s ease both}
+  .prog-card{padding:20px;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;position:relative;overflow:hidden;transition:transform 0.2s}
+  .prog-card:hover{transform:translateY(-2px)}
+  .prog-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
+  .prog-card.all::after{background:linear-gradient(90deg,var(--neon-pink),var(--neon-cyan))}
+  .prog-card.pc-common::after{background:var(--common);opacity:0.5}
+  .prog-card.pc-rare::after{background:var(--rare)}
+  .prog-card.pc-mythic::after{background:var(--mythic)}
+  .prog-card.pc-legendary::after{background:var(--legendary)}
+  .prog-label{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--subtext);margin-bottom:6px}
+  .prog-nums{font-family:'Bebas Neue',sans-serif;font-size:2rem;line-height:1;margin-bottom:8px}
+  .prog-card.all .prog-nums{background:linear-gradient(135deg,var(--neon-pink),var(--neon-cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .prog-card.pc-common .prog-nums{color:var(--common)}
+  .prog-card.pc-rare .prog-nums{color:var(--rare)}
+  .prog-card.pc-mythic .prog-nums{color:var(--mythic)}
+  .prog-card.pc-legendary .prog-nums{color:var(--legendary)}
+  .prog-bar-track{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+  .prog-bar-fill{height:100%;border-radius:2px;transition:width 1s ease}
+  .prog-card.all .prog-bar-fill{background:linear-gradient(90deg,var(--neon-pink),var(--neon-cyan))}
+  .prog-card.pc-common .prog-bar-fill{background:var(--common)}
+  .prog-card.pc-rare .prog-bar-fill{background:var(--rare)}
+  .prog-card.pc-mythic .prog-bar-fill{background:var(--mythic)}
+  .prog-card.pc-legendary .prog-bar-fill{background:var(--legendary);box-shadow:0 0 8px rgba(255,215,0,0.4)}
+
+  /* ── FILTERS ── */
+  .filters-row{display:flex;gap:12px;align-items:center;margin-bottom:28px;flex-wrap:wrap;animation:fadeUp 0.5s 0.1s ease both}
+  .search-box{position:relative;flex:1;min-width:200px}
+  .search-box input{width:100%;padding:10px 16px 10px 40px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:0.85rem;outline:none;transition:border-color 0.2s}
+  .search-box input:focus{border-color:var(--neon-pink)}
+  .search-box input::placeholder{color:var(--subtext)}
+  .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:0.9rem;opacity:0.5}
+  .filter-tabs{display:flex;gap:6px;flex-wrap:wrap}
+  .ftab{padding:8px 16px;background:var(--card-bg);border:1px solid var(--border);border-radius:100px;font-size:0.75rem;color:var(--subtext);cursor:pointer;transition:all 0.2s;white-space:nowrap}
+  .ftab:hover{border-color:rgba(255,255,255,0.2);color:var(--text)}
+  .ftab.active{color:#000;font-weight:700}
+  .ftab.active.all{background:linear-gradient(135deg,var(--neon-pink),var(--neon-cyan));border-color:transparent}
+  .ftab.active.common{background:var(--common);border-color:transparent}
+  .ftab.active.rare{background:var(--rare);border-color:transparent}
+  .ftab.active.mythic{background:var(--mythic);border-color:transparent}
+  .ftab.active.legendary{background:var(--legendary);border-color:transparent}
+  .sort-select{padding:9px 14px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;color:var(--subtext);font-family:'Noto Sans KR',sans-serif;font-size:0.78rem;outline:none;cursor:pointer}
+  .sort-select:focus{border-color:var(--neon-cyan)}
+  .view-toggle{display:flex;gap:4px}
+  .vtbtn{padding:8px 10px;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--subtext);font-size:0.85rem;transition:all 0.2s}
+  .vtbtn.active{background:rgba(255,45,120,0.15);border-color:var(--neon-pink);color:var(--neon-pink)}
+
+  /* ── GROUP FILTER ── */
+  .group-filter{display:flex;gap:8px;margin-bottom:28px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;animation:fadeUp 0.5s 0.15s ease both}
+  .group-filter::-webkit-scrollbar{display:none}
+  .gchip{flex-shrink:0;padding:6px 14px;background:var(--card-bg);border:1px solid var(--border);border-radius:100px;font-size:0.72rem;color:var(--subtext);cursor:pointer;transition:all 0.2s;white-space:nowrap}
+  .gchip:hover{border-color:var(--neon-purple);color:var(--neon-purple)}
+  .gchip.active{background:rgba(199,125,255,0.15);border-color:var(--neon-purple);color:var(--neon-purple)}
+
+  /* ── COLLECTION GRID ── */
+  .collection-section{animation:fadeUp 0.5s 0.2s ease both}
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .section-h{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.1em;color:rgba(255,255,255,0.5)}
+  .section-count{font-size:0.72rem;color:var(--subtext);letter-spacing:0.1em}
+  .kard-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:16px}
+  .kard-grid.list-view{grid-template-columns:1fr}
+
+  /* ── KARD ── */
+  .kard{border-radius:14px;position:relative;cursor:pointer;transition:transform 0.3s;animation:kardAppear 0.4s ease both}
+  @keyframes kardAppear{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
+  .kard:hover{transform:translateY(-8px) scale(1.04)}
+  .kard-body{width:100%;border-radius:14px;overflow:hidden;position:relative}
+  /* Rarities */
+  .kard.common .kard-body{background:linear-gradient(160deg,#1a2030,#2a3245);border:1px solid rgba(160,174,192,0.3);box-shadow:0 4px 16px rgba(0,0,0,0.5)}
+  .kard.rare .kard-body{background:linear-gradient(160deg,#091626,#122040);border:1.5px solid rgba(99,179,237,0.65);box-shadow:0 6px 28px rgba(99,179,237,0.25)}
+  .kard.mythic .kard-body{background:linear-gradient(160deg,#130828,#22103e);border:2px solid rgba(199,125,255,0.75);box-shadow:0 8px 36px rgba(199,125,255,0.35),0 0 20px rgba(199,125,255,0.15)}
+  .kard.legendary .kard-body{background:linear-gradient(160deg,#180e00,#2c1a00);border:2px solid rgba(255,215,0,0.85);box-shadow:0 10px 48px rgba(255,215,0,0.45),0 0 28px rgba(255,215,0,0.2),inset 0 0 30px rgba(255,215,0,0.03)}
+  /* Locked */
+  .kard.locked .kard-body{background:linear-gradient(160deg,#0a0a10,#0f0f18)!important;border:1px solid rgba(255,255,255,0.06)!important;box-shadow:none!important;filter:grayscale(1)}
+  .kard.locked{opacity:0.45}
+  .kard.locked:hover{transform:none}
+
+  .kard-holo{position:absolute;inset:0;border-radius:14px;z-index:8;pointer-events:none}
+  .kard.rare .kard-holo{background:linear-gradient(105deg,transparent 30%,rgba(99,179,237,0.07) 50%,transparent 70%);animation:holoMove 3.5s infinite}
+  .kard.mythic .kard-holo{background:linear-gradient(105deg,transparent 20%,rgba(199,125,255,0.1) 45%,rgba(255,45,120,0.06) 55%,transparent 80%);animation:holoMove 2.8s infinite}
+  .kard.legendary .kard-holo{background:linear-gradient(105deg,transparent 15%,rgba(255,215,0,0.12) 40%,rgba(255,120,50,0.07) 55%,rgba(255,215,0,0.09) 70%,transparent 85%);animation:holoMove 2.2s infinite}
+  @keyframes holoMove{0%{transform:translateX(-100%) skewX(-10deg)}100%{transform:translateX(300%) skewX(-10deg)}}
+
+  .kard-stripe{position:absolute;top:0;left:0;right:0;height:3px;z-index:10}
+  .kard.common .kard-stripe{background:linear-gradient(90deg,transparent,var(--common),transparent);opacity:0.4}
+  .kard.rare .kard-stripe{background:linear-gradient(90deg,transparent,var(--rare),transparent)}
+  .kard.mythic .kard-stripe{background:linear-gradient(90deg,transparent,var(--mythic),var(--neon-pink),transparent)}
+  .kard.legendary .kard-stripe{background:linear-gradient(90deg,transparent,var(--legendary),#fff,var(--legendary),transparent);animation:stripeGlow 1.3s infinite}
+  @keyframes stripeGlow{0%,100%{opacity:0.7}50%{opacity:1;filter:brightness(1.7)}}
+
+  .kard-sparkles{position:absolute;inset:0;pointer-events:none;z-index:9}
+  .sparkle{position:absolute;border-radius:50%;opacity:0;animation:sparkAnim 2s infinite}
+  .kard.legendary .sparkle{background:var(--neon-gold);box-shadow:0 0 5px var(--neon-gold);width:3px;height:3px}
+  .kard.mythic .sparkle{background:var(--neon-purple);box-shadow:0 0 4px var(--neon-purple);width:2.5px;height:2.5px}
+  @keyframes sparkAnim{0%,100%{opacity:0;transform:scale(0)}50%{opacity:1;transform:scale(1)}}
+
+  .kard-art{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .kard-art-emoji{font-size:3rem;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.6))}
+  .kard-art-overlay{position:absolute;bottom:0;left:0;right:0;height:50%;background:linear-gradient(to top,rgba(0,0,0,0.85),transparent)}
+  .kard.rare .kard-art::after{content:'';position:absolute;bottom:0;left:0;right:0;height:25px;background:rgba(99,179,237,0.12);filter:blur(8px)}
+  .kard.mythic .kard-art::after{content:'';position:absolute;bottom:0;left:0;right:0;height:25px;background:rgba(199,125,255,0.15);filter:blur(8px)}
+  .kard.legendary .kard-art::after{content:'';position:absolute;bottom:0;left:0;right:0;height:35px;background:rgba(255,215,0,0.2);filter:blur(10px)}
+
+  .kard-info-block{padding:10px 10px 12px}
+  .kard-group-lbl{font-size:0.5rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--subtext);margin-bottom:2px}
+  .kard-name-lbl{font-family:'Black Han Sans',sans-serif;font-size:0.82rem;color:#fff}
+  .kard-badge{display:inline-flex;align-items:center;gap:3px;margin-top:5px;padding:2px 7px;border-radius:100px;font-size:0.45rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700}
+  .kard.common .kard-badge{background:rgba(160,174,192,0.1);color:var(--common);border:1px solid rgba(160,174,192,0.2)}
+  .kard.rare .kard-badge{background:rgba(99,179,237,0.1);color:var(--rare);border:1px solid rgba(99,179,237,0.3)}
+  .kard.mythic .kard-badge{background:rgba(199,125,255,0.1);color:var(--mythic);border:1px solid rgba(199,125,255,0.35)}
+  .kard.legendary .kard-badge{background:rgba(255,215,0,0.1);color:var(--legendary);border:1px solid rgba(255,215,0,0.45);box-shadow:0 0 7px rgba(255,215,0,0.2)}
+  .kard-qty{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.15);border-radius:100px;font-size:0.55rem;padding:2px 7px;color:#fff;z-index:10;backdrop-filter:blur(4px)}
+  .lock-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:2rem;opacity:0.3;z-index:20}
+
+  /* ── LIST VIEW ── */
+  .kard-list-item{display:flex;align-items:center;gap:16px;padding:14px 16px;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.2s;animation:fadeUp 0.3s ease both}
+  .kard-list-item:hover{border-color:rgba(255,255,255,0.15);background:var(--card-bg2);transform:translateX(4px)}
+  .list-emoji{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0}
+  .list-info{flex:1}
+  .list-group{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--subtext)}
+  .list-name{font-family:'Black Han Sans',sans-serif;font-size:0.95rem;color:#fff}
+  .list-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:100px;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;margin-top:4px}
+  .list-qty-badge{font-size:0.7rem;color:var(--subtext);background:rgba(255,255,255,0.05);padding:4px 10px;border-radius:100px;border:1px solid var(--border)}
+  .list-rarity-bar{width:3px;height:44px;border-radius:2px;flex-shrink:0}
+  .kard-list-item.common .list-rarity-bar{background:var(--common)}
+  .kard-list-item.rare .list-rarity-bar{background:var(--rare)}
+  .kard-list-item.mythic .list-rarity-bar{background:var(--mythic)}
+  .kard-list-item.legendary .list-rarity-bar{background:var(--legendary);box-shadow:0 0 8px rgba(255,215,0,0.4)}
+  .kard-list-item.common .list-badge{background:rgba(160,174,192,0.1);color:var(--common);border:1px solid rgba(160,174,192,0.2)}
+  .kard-list-item.rare .list-badge{background:rgba(99,179,237,0.1);color:var(--rare);border:1px solid rgba(99,179,237,0.3)}
+  .kard-list-item.mythic .list-badge{background:rgba(199,125,255,0.1);color:var(--mythic);border:1px solid rgba(199,125,255,0.35)}
+  .kard-list-item.legendary .list-badge{background:rgba(255,215,0,0.1);color:var(--legendary);border:1px solid rgba(255,215,0,0.45)}
+
+  /* ── EMPTY STATE ── */
+  .empty-state{text-align:center;padding:80px 20px;color:var(--subtext)}
+  .empty-state .es-icon{font-size:3rem;margin-bottom:16px;opacity:0.4}
+  .empty-state .es-title{font-family:'Black Han Sans',sans-serif;font-size:1.2rem;color:rgba(255,255,255,0.3);margin-bottom:8px}
+  .empty-state .es-text{font-size:0.85rem;line-height:1.6}
+
+  /* ── CARD DETAIL MODAL ── */
+  .card-modal-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);align-items:center;justify-content:center}
+  .card-modal-overlay.active{display:flex}
+  .card-modal{background:var(--card-bg2);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:0;width:100%;max-width:480px;position:relative;overflow:hidden;animation:modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1)}
+  @keyframes modalIn{from{transform:scale(0.85) translateY(30px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+  .cm-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:none;color:var(--subtext);font-size:1rem;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:10;transition:all 0.2s}
+  .cm-close:hover{background:rgba(255,255,255,0.15);color:#fff}
+  .cm-header{padding:40px 32px 24px;position:relative;text-align:center;background:var(--cm-bg,linear-gradient(160deg,#0a0a12,#12121e))}
+  .cm-emoji{font-size:5rem;margin-bottom:12px;filter:drop-shadow(0 8px 20px rgba(0,0,0,0.5))}
+  .cm-group{font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--subtext);margin-bottom:4px}
+  .cm-name{font-family:'Black Han Sans',sans-serif;font-size:2rem;color:#fff}
+  .cm-badge{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:4px 14px;border-radius:100px;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:700}
+  .cm-body{padding:24px 32px 32px}
+  .cm-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px}
+  .cm-stat{text-align:center;padding:14px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid var(--border)}
+  .cm-stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:#fff}
+  .cm-stat-lbl{font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--subtext);margin-top:3px}
+  .cm-actions{display:flex;gap:10px}
+  .cm-btn{flex:1;padding:12px;border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:0.8rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;cursor:pointer;transition:all 0.2s}
+  .cm-btn.trade{background:transparent;border:1px solid rgba(0,245,255,0.4);color:var(--neon-cyan)}
+  .cm-btn.trade:hover{background:rgba(0,245,255,0.08)}
+  .cm-btn.fav{background:transparent;border:1px solid rgba(255,45,120,0.4);color:var(--neon-pink)}
+  .cm-btn.fav:hover{background:rgba(255,45,120,0.08)}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  @media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:20px}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">KpopKard<span>Drop</span></div>
+  <div class="nav-section-label">Menu</div>
+  <a class="nav-item" href="KpopKardDrop.html"><span class="ni">🏠</span> Accueil</a>
+  <a class="nav-item active" href="#"><span class="ni">🃏</span> Ma Collection</a>
+  <a class="nav-item" href="#"><span class="ni">🛍️</span> Boutique</a>
+  <div class="nav-divider"></div>
+  <div class="nav-section-label">Social</div>
+  <a class="nav-item" href="#"><span class="ni">👥</span> Amis</a>
+  <a class="nav-item" href="#"><span class="ni">🔄</span> Échanges</a>
+  <a class="nav-item" href="#"><span class="ni">💬</span> Tchat</a>
+  <div class="nav-divider"></div>
+  <div class="nav-section-label">Compte</div>
+  <a class="nav-item" href="#"><span class="ni">👤</span> Profil</a>
+  <a class="nav-item" href="#"><span class="ni">🏆</span> Classement</a>
+  <a class="nav-item" href="#"><span class="ni">⚙️</span> Paramètres</a>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="user-avatar">K</div>
+      <div><div class="user-name">KFan2026</div><div class="user-rank">✦ Rang #142</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="page-title-block">
+      <div class="page-eyebrow">✦ Mon espace</div>
+      <div class="page-title">Ma Collection</div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-sm btn-outline">📤 Exporter</button>
+      <button class="btn-sm btn-pink" onclick="window.location='KpopKardDrop.html'">+ Ouvrir un booster</button>
+    </div>
+  </div>
+
+  <!-- PROGRESS OVERVIEW -->
+  <div class="progress-overview" id="progressCards"></div>
+
+  <!-- FILTERS -->
+  <div class="filters-row">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Rechercher un artiste, un groupe..." oninput="filterCards()">
+    </div>
+    <div class="filter-tabs">
+      <div class="ftab active all" data-rarity="all" onclick="setRarity(this,'all')">Toutes</div>
+      <div class="ftab common" data-rarity="common" onclick="setRarity(this,'common')">🃏 Communes</div>
+      <div class="ftab rare" data-rarity="rare" onclick="setRarity(this,'rare')">💎 Rares</div>
+      <div class="ftab mythic" data-rarity="mythic" onclick="setRarity(this,'mythic')">✨ Mythiques</div>
+      <div class="ftab legendary" data-rarity="legendary" onclick="setRarity(this,'legendary')">👑 Légendaires</div>
+    </div>
+    <select class="sort-select" id="sortSelect" onchange="filterCards()">
+      <option value="rarity">Trier : Rareté</option>
+      <option value="name">Trier : Nom</option>
+      <option value="group">Trier : Groupe</option>
+      <option value="qty">Trier : Quantité</option>
+    </select>
+    <div class="view-toggle">
+      <button class="vtbtn active" id="gridBtn" onclick="setView('grid')">⊞</button>
+      <button class="vtbtn" id="listBtn" onclick="setView('list')">☰</button>
+    </div>
+  </div>
+
+  <!-- GROUP FILTER -->
+  <div class="group-filter" id="groupFilter"></div>
+
+  <!-- COLLECTION -->
+  <div class="collection-section">
+    <div class="section-header">
+      <div class="section-h" id="sectionLabel">TOUTES LES CARTES</div>
+      <div class="section-count" id="sectionCount"></div>
+    </div>
+    <div class="kard-grid" id="cardGrid"></div>
+  </div>
+</main>
+
+<!-- CARD DETAIL MODAL -->
+<div class="card-modal-overlay" id="cardModal" onclick="closeCardModal(event)">
+  <div class="card-modal" id="cardModalInner">
+    <button class="cm-close" onclick="closeModal()">✕</button>
+    <div class="cm-header" id="cmHeader">
+      <div class="cm-emoji" id="cmEmoji"></div>
+      <div class="cm-group" id="cmGroup"></div>
+      <div class="cm-name" id="cmName"></div>
+      <div class="cm-badge" id="cmBadge"></div>
+    </div>
+    <div class="cm-body">
+      <div class="cm-stats">
+        <div class="cm-stat"><div class="cm-stat-val" id="cmQty">1</div><div class="cm-stat-lbl">En collection</div></div>
+        <div class="cm-stat"><div class="cm-stat-val" id="cmRank">#—</div><div class="cm-stat-lbl">Rareté rang</div></div>
+        <div class="cm-stat"><div class="cm-stat-val" id="cmVal">—</div><div class="cm-stat-lbl">Valeur estim.</div></div>
+      </div>
+      <div class="cm-actions">
+        <button class="cm-btn trade">🔄 Proposer un échange</button>
+        <button class="cm-btn fav" id="favBtn" onclick="toggleFav()">♡ Favoris</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══ DATA ═══
+const ALL_CARDS = [
+  // LEGENDARY (owned)
+  {id:'L1',group:'BTS',name:'Jin',rarity:'legendary',emoji:'🌸',bg:'linear-gradient(160deg,#1a0020,#2e0040)',qty:1,owned:true,fav:false,val:'Très élevée',rank:'#012'},
+  {id:'L2',group:'BIGBANG',name:'G-Dragon',rarity:'legendary',emoji:'👁',bg:'linear-gradient(160deg,#0a0015,#18003a)',qty:1,owned:true,fav:true,val:'Très élevée',rank:'#008'},
+  {id:'L3',group:'BLACKPINK',name:'Jennie',rarity:'legendary',emoji:'🖤',bg:'linear-gradient(160deg,#1a0008,#300015)',qty:0,owned:false,fav:false,val:'Très élevée',rank:'#003'},
+  {id:'L4',group:'IVE',name:'Wonyoung',rarity:'legendary',emoji:'🌺',bg:'linear-gradient(160deg,#001818,#002e2e)',qty:0,owned:false,fav:false,val:'Très élevée',rank:'#019'},
+  // MYTHIC
+  {id:'M1',group:'aespa',name:'Karina',rarity:'mythic',emoji:'🤖',bg:'linear-gradient(160deg,#0a0a1a,#15152e)',qty:2,owned:true,fav:true,val:'Élevée',rank:'#044'},
+  {id:'M2',group:'NewJeans',name:'Hanni',rarity:'mythic',emoji:'🎀',bg:'linear-gradient(160deg,#0a001a,#15002e)',qty:1,owned:true,fav:false,val:'Élevée',rank:'#067'},
+  {id:'M3',group:'Red Velvet',name:'Irene',rarity:'mythic',emoji:'🌹',bg:'linear-gradient(160deg,#1a0a0a,#2e1515)',qty:0,owned:false,fav:false,val:'Élevée',rank:'#031'},
+  {id:'M4',group:'TWICE',name:'Nayeon',rarity:'mythic',emoji:'🐰',bg:'linear-gradient(160deg,#001a08,#002e15)',qty:1,owned:true,fav:false,val:'Élevée',rank:'#055'},
+  {id:'M5',group:'LE SSERAFIM',name:'Kazuha',rarity:'mythic',emoji:'🍂',bg:'linear-gradient(160deg,#1a0800,#2e1500)',qty:0,owned:false,fav:false,val:'Élevée',rank:'#082'},
+  // RARE
+  {id:'R1',group:'Stray Kids',name:'Felix',rarity:'rare',emoji:'🔥',bg:'linear-gradient(160deg,#001018,#001828)',qty:3,owned:true,fav:false,val:'Moyenne',rank:'#201'},
+  {id:'R2',group:'EXO',name:'Baekhyun',rarity:'rare',emoji:'⭐',bg:'linear-gradient(160deg,#080818,#101028)',qty:1,owned:true,fav:false,val:'Moyenne',rank:'#188'},
+  {id:'R3',group:'NCT',name:'Taeyong',rarity:'rare',emoji:'🖤',bg:'linear-gradient(160deg,#050510,#0a0a20)',qty:2,owned:true,fav:true,val:'Moyenne',rank:'#215'},
+  {id:'R4',group:'ITZY',name:'Yeji',rarity:'rare',emoji:'🐱',bg:'linear-gradient(160deg,#100010,#200020)',qty:0,owned:false,fav:false,val:'Moyenne',rank:'#242'},
+  {id:'R5',group:'ENHYPEN',name:'Ni-ki',rarity:'rare',emoji:'🌙',bg:'linear-gradient(160deg,#000818,#001028)',qty:1,owned:true,fav:false,val:'Moyenne',rank:'#267'},
+  {id:'R6',group:'TXT',name:'Yeonjun',rarity:'rare',emoji:'🦋',bg:'linear-gradient(160deg,#080018,#100028)',qty:0,owned:false,fav:false,val:'Moyenne',rank:'#299'},
+  // COMMON
+  {id:'C1',group:'SEVENTEEN',name:'Woozi',rarity:'common',emoji:'🎹',bg:'linear-gradient(160deg,#0a0a12,#141420)',qty:5,owned:true,fav:false,val:'Faible',rank:'#412'},
+  {id:'C2',group:'GOT7',name:'BamBam',rarity:'common',emoji:'💫',bg:'linear-gradient(160deg,#080810,#101018)',qty:2,owned:true,fav:false,val:'Faible',rank:'#388'},
+  {id:'C3',group:'MONSTA X',name:'Shownu',rarity:'common',emoji:'💪',bg:'linear-gradient(160deg,#080808,#101010)',qty:1,owned:true,fav:false,val:'Faible',rank:'#401'},
+  {id:'C4',group:'(G)I-DLE',name:'Minnie',rarity:'common',emoji:'🌻',bg:'linear-gradient(160deg,#0a0800,#181000)',qty:0,owned:false,fav:false,val:'Faible',rank:'#377'},
+  {id:'C5',group:'NMIXX',name:'Sullyoon',rarity:'common',emoji:'🌊',bg:'linear-gradient(160deg,#000a10,#001018)',qty:3,owned:true,fav:false,val:'Faible',rank:'#433'},
+  {id:'C6',group:'MAMAMOO',name:'Hwasa',rarity:'common',emoji:'🔮',bg:'linear-gradient(160deg,#080008,#100010)',qty:1,owned:true,fav:false,val:'Faible',rank:'#422'},
+];
+
+const LABELS = {common:'Commune',rare:'Rare',mythic:'Mythique',legendary:'Légendaire'};
+const ICONS = {common:'🃏',rare:'💎',mythic:'✨',legendary:'👑'};
+const RARITY_ORDER = {legendary:0,mythic:1,rare:2,common:3};
+
+let currentRarity = 'all';
+let currentGroup = 'all';
+let currentView = 'grid';
+let favCards = new Set(ALL_CARDS.filter(c=>c.fav).map(c=>c.id));
+let activeCard = null;
+
+// ═══ INIT ═══
+function init() {
+  renderProgress();
+  renderGroupFilter();
+  filterCards();
+}
+
+function renderProgress() {
+  const owned = ALL_CARDS.filter(c=>c.owned);
+  const total = ALL_CARDS.length;
+  const byRarity = r => ({owned:ALL_CARDS.filter(c=>c.rarity===r&&c.owned).length, total:ALL_CARDS.filter(c=>c.rarity===r).length});
+  const c=byRarity('common'),r=byRarity('rare'),m=byRarity('mythic'),l=byRarity('legendary');
+  document.getElementById('progressCards').innerHTML = `
+    <div class="prog-card all"><div class="prog-label">Collection totale</div><div class="prog-nums">${owned.length}/${total}</div><div class="prog-bar-track"><div class="prog-bar-fill" style="width:${owned.length/total*100}%"></div></div></div>
+    <div class="prog-card pc-common"><div class="prog-label">🃏 Communes</div><div class="prog-nums">${c.owned}/${c.total}</div><div class="prog-bar-track"><div class="prog-bar-fill" style="width:${c.owned/c.total*100}%"></div></div></div>
+    <div class="prog-card pc-rare"><div class="prog-label">💎 Rares</div><div class="prog-nums">${r.owned}/${r.total}</div><div class="prog-bar-track"><div class="prog-bar-fill" style="width:${r.owned/r.total*100}%"></div></div></div>
+    <div class="prog-card pc-mythic"><div class="prog-label">✨ Mythiques</div><div class="prog-nums">${m.owned}/${m.total}</div><div class="prog-bar-track"><div class="prog-bar-fill" style="width:${m.owned/m.total*100}%"></div></div></div>
+  `;
+  // Legendary separate to keep 4-column layout
+  document.querySelector('.progress-overview').innerHTML += `<div class="prog-card pc-legendary" style="grid-column:span 1"><div class="prog-label">👑 Légendaires</div><div class="prog-nums">${l.owned}/${l.total}</div><div class="prog-bar-track"><div class="prog-bar-fill" style="width:${l.owned/l.total*100}%"></div></div></div>`;
+  document.getElementById('progressCards').style.gridTemplateColumns='repeat(5,1fr)';
+}
+
+function renderGroupFilter() {
+  const groups = ['all',...new Set(ALL_CARDS.map(c=>c.group))];
+  document.getElementById('groupFilter').innerHTML = groups.map(g=>`
+    <div class="gchip ${g==='all'?'active':''}" data-group="${g}" onclick="setGroup(this,'${g}')">${g==='all'?'Tous les groupes':g}</div>
+  `).join('');
+}
+
+function setRarity(el, r) {
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  currentRarity = r;
+  filterCards();
+}
+
+function setGroup(el, g) {
+  document.querySelectorAll('.gchip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  currentGroup = g;
+  filterCards();
+}
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('gridBtn').classList.toggle('active', v==='grid');
+  document.getElementById('listBtn').classList.toggle('active', v==='list');
+  filterCards();
+}
+
+function filterCards() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const sort = document.getElementById('sortSelect').value;
+  let cards = [...ALL_CARDS];
+  if(currentRarity !== 'all') cards = cards.filter(c=>c.rarity===currentRarity);
+  if(currentGroup !== 'all') cards = cards.filter(c=>c.group===currentGroup);
+  if(search) cards = cards.filter(c=>c.name.toLowerCase().includes(search)||c.group.toLowerCase().includes(search));
+  if(sort==='rarity') cards.sort((a,b)=>RARITY_ORDER[a.rarity]-RARITY_ORDER[b.rarity]);
+  else if(sort==='name') cards.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(sort==='group') cards.sort((a,b)=>a.group.localeCompare(b.group));
+  else if(sort==='qty') cards.sort((a,b)=>b.qty-a.qty);
+
+  const owned = cards.filter(c=>c.owned);
+  const locked = cards.filter(c=>!c.owned);
+  const all = [...owned,...locked];
+
+  const label = currentRarity==='all'?'TOUTES LES CARTES':`CARTES ${LABELS[currentRarity]?.toUpperCase()}S`;
+  document.getElementById('sectionLabel').textContent = label;
+  document.getElementById('sectionCount').textContent = `${owned.length} possédées · ${locked.length} manquantes`;
+
+  const grid = document.getElementById('cardGrid');
+  if(currentView==='grid'){
+    grid.className='kard-grid';
+    grid.innerHTML = all.length ? all.map((c,i)=>buildKard(c,i)).join('') : emptyState();
+  } else {
+    grid.className='kard-grid list-view';
+    grid.innerHTML = all.length ? all.map((c,i)=>buildListItem(c,i)).join('') : emptyState();
+  }
+}
+
+function buildKard(card, idx) {
+  const sparkPos = [[12,18],[72,14],[28,72],[82,58],[48,38]];
+  const sparks = (card.rarity==='legendary'||card.rarity==='mythic') ? sparkPos.map((p,i)=>`<div class="sparkle" style="left:${p[0]}%;top:${p[1]}%;animation-delay:${i*0.3}s"></div>`).join('') : '';
+  const locked = !card.owned;
+  return `
+    <div class="kard ${card.rarity} ${locked?'locked':''}" style="animation-delay:${Math.min(idx,12)*0.04}s" onclick="${locked?'':  `openCard('${card.id}')`}">
+      <div class="kard-body">
+        <div class="kard-stripe"></div>
+        ${!locked?`<div class="kard-holo"></div>`:''}
+        <div class="kard-sparkles">${sparks}</div>
+        <div class="kard-art" style="background:${card.bg}">
+          <div class="kard-art-emoji">${card.emoji}</div>
+          <div class="kard-art-overlay"></div>
+        </div>
+        ${locked?`<div class="lock-icon">🔒</div>`:''}
+        <div class="kard-info-block">
+          <div class="kard-group-lbl">${card.group}</div>
+          <div class="kard-name-lbl">${card.name}</div>
+          <div class="kard-badge">${ICONS[card.rarity]} ${LABELS[card.rarity]}</div>
+        </div>
+        ${card.qty>1?`<div class="kard-qty">x${card.qty}</div>`:''}
+        ${favCards.has(card.id)?`<div style="position:absolute;top:8px;left:8px;font-size:0.8rem;z-index:10">❤️</div>`:''}
+      </div>
+    </div>`;
+}
+
+function buildListItem(card, idx) {
+  const locked = !card.owned;
+  return `
+    <div class="kard-list-item ${card.rarity} ${locked?'locked':''}" style="animation-delay:${Math.min(idx,15)*0.03}s" onclick="${locked?'':` openCard('${card.id}')`}">
+      <div class="list-rarity-bar"></div>
+      <div class="list-emoji" style="background:${card.bg}">${card.emoji}</div>
+      <div class="list-info">
+        <div class="list-group">${card.group}</div>
+        <div class="list-name">${card.name} ${locked?'🔒':''} ${favCards.has(card.id)?'❤️':''}</div>
+        <div class="list-badge">${ICONS[card.rarity]} ${LABELS[card.rarity]}</div>
+      </div>
+      ${card.owned?`<div class="list-qty-badge">×${card.qty}</div>`:`<div class="list-qty-badge" style="opacity:0.4">Non possédée</div>`}
+    </div>`;
+}
+
+function emptyState(){return`<div class="empty-state"><div class="es-icon">🔍</div><div class="es-title">Aucune carte trouvée</div><div class="es-text">Essaie un autre filtre ou ouvre des boosters pour agrandir ta collection !</div></div>`;}
+
+// ═══ CARD MODAL ═══
+function openCard(id) {
+  activeCard = ALL_CARDS.find(c=>c.id===id);
+  if(!activeCard) return;
+  const c = activeCard;
+  const colorsMap = {legendary:'linear-gradient(160deg,#1a1000,#2c1a00)',mythic:'linear-gradient(160deg,#130828,#22103e)',rare:'linear-gradient(160deg,#091626,#122040)',common:'linear-gradient(160deg,#1a2030,#2a3245)'};
+  const borderMap = {legendary:'rgba(255,215,0,0.4)',mythic:'rgba(199,125,255,0.4)',rare:'rgba(99,179,237,0.3)',common:'rgba(160,174,192,0.2)'};
+  document.getElementById('cmHeader').style.background = c.bg;
+  document.getElementById('cmEmoji').textContent = c.emoji;
+  document.getElementById('cmGroup').textContent = c.group;
+  document.getElementById('cmName').textContent = c.name;
+  const badge = document.getElementById('cmBadge');
+  badge.textContent = `${ICONS[c.rarity]} ${LABELS[c.rarity]}`;
+  badge.style.cssText = `background:rgba(255,255,255,0.08);color:#fff;border:1px solid ${borderMap[c.rarity]}`;
+  document.getElementById('cmQty').textContent = c.qty;
+  document.getElementById('cmRank').textContent = c.rank;
+  document.getElementById('cmVal').textContent = c.val==='Très élevée'?'★★★':c.val==='Élevée'?'★★☆':c.val==='Moyenne'?'★☆☆':'☆☆☆';
+  document.getElementById('favBtn').textContent = favCards.has(c.id)?'❤️ Favoris':'♡ Favoris';
+  document.getElementById('cardModal').classList.add('active');
+}
+function closeModal(){document.getElementById('cardModal').classList.remove('active');activeCard=null;}
+function closeCardModal(e){if(e.target===document.getElementById('cardModal'))closeModal();}
+function toggleFav(){
+  if(!activeCard) return;
+  if(favCards.has(activeCard.id)){favCards.delete(activeCard.id);document.getElementById('favBtn').textContent='♡ Favoris';}
+  else{favCards.add(activeCard.id);document.getElementById('favBtn').textContent='❤️ Favoris';}
+  filterCards();
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+// ── CONNEXION BACKEND ──
+async function loadRealCollection() {
+  if (!window.KKD?.Auth.isLoggedIn()) { init(); return; } // fallback mock
+  try {
+    KKD.UI.showLoader('Chargement de ta collection...');
+    const apiCards = await KKD.CardsAPI.getCollection();
+    KKD.UI.hideLoader();
+
+    // Transformer le format API → format attendu par le renderer
+    ALL_CARDS.length = 0;
+    apiCards.forEach(c => {
+      ALL_CARDS.push({
+        id:     c.id,
+        group:  c.groupName,
+        name:   c.name.split(' — ')[0], // Juste le nom de l'artiste
+        rarity: c.rarity,
+        emoji:  c.emoji,
+        bg:     c.bgColor,
+        qty:    c.quantity,
+        owned:  c.owned,
+        fav:    c.favorite,
+        val:    c.rarity === 'LEGENDARY' ? 'Très élevée' : c.rarity === 'MYTHIC' ? 'Élevée' : c.rarity === 'RARE' ? 'Moyenne' : 'Faible',
+        rank:   '#' + c.id.substring(0,6),
+        // Photo réelle si disponible
+        imageUrl: c.imageUrl || null,
+      });
+    });
+
+    // Sync favoris
+    favCards = new Set(ALL_CARDS.filter(c=>c.fav).map(c=>c.id));
+    init();
+  } catch(err) {
+    KKD.UI.hideLoader();
+    KKD.UI.toast('Erreur chargement collection, mode démo actif.', 'info');
+    init(); // fallback sur les données mock
+  }
+}
+
+// Toggle favori réel
+async function toggleFavReal() {
+  if (!activeCard) return;
+  try {
+    await KKD.CardsAPI.toggleFavorite(activeCard.id);
+    if (favCards.has(activeCard.id)) {
+      favCards.delete(activeCard.id);
+      document.getElementById('favBtn').textContent = '♡ Favoris';
+    } else {
+      favCards.add(activeCard.id);
+      document.getElementById('favBtn').textContent = '❤️ Favoris';
+    }
+    filterCards();
+  } catch(err) {
+    KKD.UI.toast(err.message, 'error');
+  }
+}
+
+// Override toggleFav si connecté
+function toggleFav() {
+  if (window.KKD?.Auth.isLoggedIn()) return toggleFavReal();
+  if(!activeCard) return;
+  if(favCards.has(activeCard.id)){favCards.delete(activeCard.id);document.getElementById('favBtn').textContent='♡ Favoris';}
+  else{favCards.add(activeCard.id);document.getElementById('favBtn').textContent='❤️ Favoris';}
+  filterCards();
+}
+
+// Démarrage
+loadRealCollection();
+</script>
+<script src="api.js"></script>
+</body>
+</html>

@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KpopKardDrop — Boutique</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:#050508;--deep:#0a0a12;--card-bg:#0f0f1c;--card-bg2:#13131f;
+    --neon-pink:#ff2d78;--neon-cyan:#00f5ff;--neon-gold:#ffd700;--neon-purple:#c77dff;
+    --common:#a0aec0;--rare:#63b3ed;--mythic:#c77dff;--legendary:#ffd700;
+    --text:#e8e8f0;--subtext:#6a6a90;--border:rgba(255,255,255,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--black);color:var(--text);font-family:'Noto Sans KR',sans-serif;overflow-x:hidden}
+  .bg-grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(255,45,120,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,45,120,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+  .bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(255,45,120,0.1) 0%,transparent 70%),radial-gradient(ellipse 50% 35% at 80% 80%,rgba(255,215,0,0.06) 0%,transparent 70%)}
+
+  /* SIDEBAR */
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:rgba(8,8,14,0.97);backdrop-filter:blur(20px);border-right:1px solid var(--border);z-index:100;display:flex;flex-direction:column;padding:28px 0}
+  .sidebar-logo{padding:0 24px 32px;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.1em;background:linear-gradient(90deg,var(--neon-pink),var(--neon-cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .sidebar-logo span{background:linear-gradient(90deg,var(--neon-cyan),var(--neon-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .nav-section-label{padding:0 24px 8px;font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--subtext)}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:11px 24px;color:var(--subtext);text-decoration:none;font-size:0.82rem;letter-spacing:0.05em;transition:all 0.2s;position:relative;cursor:pointer}
+  .nav-item:hover{color:var(--text);background:rgba(255,255,255,0.04)}
+  .nav-item.active{color:#fff;background:rgba(255,45,120,0.1)}
+  .nav-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--neon-pink)}
+  .nav-item .ni{font-size:1rem;width:20px;text-align:center}
+  .nav-divider{height:1px;background:var(--border);margin:12px 0}
+  .sidebar-footer{margin-top:auto;padding:16px 24px;border-top:1px solid var(--border)}
+  .user-chip{display:flex;align-items:center;gap:10px}
+  .user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--neon-pink),var(--neon-purple));display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:#000;flex-shrink:0}
+  .user-name{font-size:0.8rem;color:var(--text)}
+  .user-rank{font-size:0.65rem;color:var(--subtext)}
+  /* KKD coins widget */
+  .coins-widget{margin:0 16px 8px;padding:10px 14px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2);border-radius:10px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all 0.2s}
+  .coins-widget:hover{background:rgba(255,215,0,0.12)}
+  .coins-icon{font-size:1.1rem}
+  .coins-info{flex:1}
+  .coins-amount{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--neon-gold);letter-spacing:0.05em}
+  .coins-label{font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--subtext)}
+  .coins-add{font-size:0.8rem;color:var(--neon-gold);opacity:0.7}
+  /* KardPoints widget */
+  .points-widget{margin:0 16px 16px;padding:10px 14px;background:rgba(0,245,255,0.06);border:1px solid rgba(0,245,255,0.18);border-radius:10px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all 0.2s}
+  .points-widget:hover{background:rgba(0,245,255,0.1)}
+  .points-amount{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--neon-cyan);letter-spacing:0.05em}
+  .points-label{font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--subtext)}
+
+  /* MAIN */
+  .main{margin-left:220px;padding:40px 48px 100px;position:relative;z-index:1}
+
+  /* HEADER */
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:48px;animation:fadeUp 0.5s ease both}
+  .page-eyebrow{font-size:0.65rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--neon-gold);margin-bottom:6px}
+  .page-title{font-family:'Black Han Sans',sans-serif;font-size:2.8rem;line-height:1;background:linear-gradient(135deg,#fff,rgba(255,255,255,0.5));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .header-balance{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+  .balance-label{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--subtext)}
+  .balance-amount{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--neon-gold);filter:drop-shadow(0 0 10px rgba(255,215,0,0.3))}
+
+  /* PROMO BANNER */
+  .promo-banner{background:linear-gradient(135deg,rgba(255,45,120,0.15),rgba(199,125,255,0.1));border:1px solid rgba(255,45,120,0.25);border-radius:16px;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;margin-bottom:48px;overflow:hidden;position:relative;animation:fadeUp 0.5s 0.05s ease both}
+  .promo-banner::before{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.02) 50%,transparent 60%);animation:shimmer 4s infinite}
+  @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(200%)} }
+  .promo-text .promo-tag{font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--neon-pink);margin-bottom:4px}
+  .promo-text .promo-title{font-family:'Black Han Sans',sans-serif;font-size:1.4rem;color:#fff;margin-bottom:4px}
+  .promo-text .promo-desc{font-size:0.8rem;color:var(--subtext)}
+  .promo-countdown{text-align:center}
+  .countdown-label{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--subtext);margin-bottom:6px}
+  .countdown-time{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--neon-pink);letter-spacing:0.1em;filter:drop-shadow(0 0 10px rgba(255,45,120,0.4))}
+  .promo-btn{padding:12px 28px;background:linear-gradient(135deg,var(--neon-pink),#ff6eb4);color:#000;font-weight:700;font-family:'Noto Sans KR',sans-serif;font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;border:none;border-radius:8px;cursor:pointer;box-shadow:0 0 20px rgba(255,45,120,0.4);transition:all 0.3s}
+  .promo-btn:hover{transform:scale(1.05);box-shadow:0 0 32px rgba(255,45,120,0.6)}
+
+  /* SECTION TITLES */
+  .shop-section{margin-bottom:56px;animation:fadeUp 0.5s ease both}
+  .shop-section:nth-child(3){animation-delay:0.1s}
+  .shop-section:nth-child(4){animation-delay:0.15s}
+  .shop-section:nth-child(5){animation-delay:0.2s}
+  .section-tag{font-size:0.68rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--neon-pink);margin-bottom:8px}
+  .section-title{font-family:'Black Han Sans',sans-serif;font-size:1.8rem;line-height:1;color:#fff;margin-bottom:6px}
+  .section-desc{font-size:0.82rem;color:var(--subtext);margin-bottom:28px}
+
+  /* BOOSTER PACKS GRID */
+  .packs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px}
+
+  /* PACK CARD */
+  .pack-card{border-radius:18px;overflow:hidden;position:relative;cursor:pointer;transition:transform 0.3s;animation:fadeUp 0.4s ease both}
+  .pack-card:hover{transform:translateY(-8px)}
+  .pack-card.featured{grid-column:span 2}
+  .pack-visual{height:200px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .pack-card.featured .pack-visual{height:240px}
+  .pack-3d{width:110px;height:160px;border-radius:12px;position:relative;transition:transform 0.4s;transform:perspective(600px) rotateY(-8deg);box-shadow:12px 12px 40px rgba(0,0,0,0.5);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+  .pack-card:hover .pack-3d{transform:perspective(600px) rotateY(0deg) scale(1.08)}
+  .pack-3d-shimmer{position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.08) 50%,transparent 60%);animation:shimmer 2.5s infinite}
+  .pack-logo-3d{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.12em;z-index:1}
+  .pack-stars-3d{font-size:1rem;z-index:1;letter-spacing:4px}
+  .pack-sub-3d{position:absolute;bottom:10px;font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;z-index:1;opacity:0.7}
+  /* Particle float around pack */
+  .pack-particles{position:absolute;inset:0;pointer-events:none}
+  .pp{position:absolute;border-radius:50%;animation:ppFloat linear infinite;opacity:0}
+  @keyframes ppFloat{0%{opacity:0;transform:translateY(0) scale(0)}20%{opacity:0.8}80%{opacity:0.4}100%{opacity:0;transform:translateY(-80px) scale(1.5)}}
+
+  .pack-info{padding:20px 22px}
+  .pack-name{font-family:'Black Han Sans',sans-serif;font-size:1.15rem;color:#fff;margin-bottom:4px}
+  .pack-desc{font-size:0.75rem;color:var(--subtext);margin-bottom:12px;line-height:1.5}
+  .pack-guarantees{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+  .pack-guar{padding:3px 10px;border-radius:100px;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700}
+  .pack-guar.common{background:rgba(160,174,192,0.1);color:var(--common);border:1px solid rgba(160,174,192,0.2)}
+  .pack-guar.rare{background:rgba(99,179,237,0.1);color:var(--rare);border:1px solid rgba(99,179,237,0.25)}
+  .pack-guar.mythic{background:rgba(199,125,255,0.1);color:var(--mythic);border:1px solid rgba(199,125,255,0.3)}
+  .pack-guar.legendary{background:rgba(255,215,0,0.1);color:var(--legendary);border:1px solid rgba(255,215,0,0.3)}
+  .pack-footer{display:flex;align-items:center;justify-content:space-between}
+  .pack-price-block{}
+  .pack-old-price{font-size:0.7rem;color:var(--subtext);text-decoration:line-through;margin-bottom:2px}
+  .pack-price{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;line-height:1}
+  .pack-price-unit{font-size:0.7rem;color:var(--subtext)}
+  .pack-buy-btn{padding:11px 22px;border:none;border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:0.78rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s}
+  .pack-buy-btn:hover{transform:scale(1.04)}
+
+  /* Pack themes */
+  .pack-card.standard .pack-visual{background:linear-gradient(145deg,#1a0a2e,#2d1b4e)}
+  .pack-card.standard .pack-3d{background:linear-gradient(145deg,#200c38,#341e58);border:1px solid rgba(199,125,255,0.4)}
+  .pack-card.standard .pack-logo-3d{background:linear-gradient(135deg,var(--neon-pink),var(--neon-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .pack-card.standard .pack-stars-3d{color:var(--neon-purple);filter:drop-shadow(0 0 6px var(--neon-purple))}
+  .pack-card.standard .pack-name{color:#fff}
+  .pack-card.standard .pack-price{background:linear-gradient(135deg,#fff,var(--subtext));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .pack-card.standard .pack-buy-btn{background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));color:#000;box-shadow:0 0 16px rgba(199,125,255,0.3)}
+  .pack-card.standard{background:linear-gradient(160deg,#0e0818,#14101e);border:1px solid rgba(199,125,255,0.15)}
+
+  .pack-card.rare-pack .pack-visual{background:linear-gradient(145deg,#091626,#0d2038)}
+  .pack-card.rare-pack .pack-3d{background:linear-gradient(145deg,#0a1c30,#102840);border:1.5px solid rgba(99,179,237,0.5);box-shadow:12px 12px 40px rgba(0,0,0,0.5),0 0 20px rgba(99,179,237,0.15)}
+  .pack-card.rare-pack .pack-logo-3d{background:linear-gradient(135deg,var(--rare),var(--neon-cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .pack-card.rare-pack .pack-stars-3d{color:var(--rare);filter:drop-shadow(0 0 6px var(--rare))}
+  .pack-card.rare-pack .pack-price{color:var(--rare)}
+  .pack-card.rare-pack .pack-buy-btn{background:linear-gradient(135deg,var(--rare),var(--neon-cyan));color:#000;box-shadow:0 0 16px rgba(99,179,237,0.3)}
+  .pack-card.rare-pack{background:linear-gradient(160deg,#060e18,#0a1420);border:1px solid rgba(99,179,237,0.12)}
+
+  .pack-card.mythic-pack .pack-visual{background:linear-gradient(145deg,#0e0520,#180a38)}
+  .pack-card.mythic-pack .pack-3d{background:linear-gradient(145deg,#150830,#200d48);border:2px solid rgba(199,125,255,0.6);box-shadow:12px 12px 40px rgba(0,0,0,0.5),0 0 30px rgba(199,125,255,0.2)}
+  .pack-card.mythic-pack .pack-logo-3d{background:linear-gradient(135deg,var(--mythic),var(--neon-pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .pack-card.mythic-pack .pack-stars-3d{color:var(--mythic);filter:drop-shadow(0 0 8px var(--mythic))}
+  .pack-card.mythic-pack .pack-price{color:var(--mythic)}
+  .pack-card.mythic-pack .pack-buy-btn{background:linear-gradient(135deg,var(--mythic),var(--neon-pink));color:#000;box-shadow:0 0 16px rgba(199,125,255,0.4)}
+  .pack-card.mythic-pack{background:linear-gradient(160deg,#090510,#120818);border:1px solid rgba(199,125,255,0.18)}
+
+  .pack-card.legendary-pack .pack-visual{background:linear-gradient(145deg,#1c0d00,#2e1800)}
+  .pack-card.legendary-pack .pack-3d{background:linear-gradient(145deg,#240e00,#381a00);border:2px solid rgba(255,215,0,0.7);box-shadow:12px 12px 40px rgba(0,0,0,0.5),0 0 40px rgba(255,215,0,0.25),inset 0 0 20px rgba(255,215,0,0.03)}
+  .pack-card.legendary-pack .pack-logo-3d{background:linear-gradient(135deg,var(--legendary),#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .pack-card.legendary-pack .pack-stars-3d{color:var(--legendary);filter:drop-shadow(0 0 10px var(--legendary));animation:goldPulse 1.5s infinite}
+  @keyframes goldPulse{0%,100%{filter:drop-shadow(0 0 10px var(--legendary))}50%{filter:drop-shadow(0 0 22px var(--legendary)) brightness(1.3)}}
+  .pack-card.legendary-pack .pack-price{color:var(--legendary);filter:drop-shadow(0 0 8px rgba(255,215,0,0.3))}
+  .pack-card.legendary-pack .pack-buy-btn{background:linear-gradient(135deg,var(--legendary),#ffaa00);color:#000;box-shadow:0 0 22px rgba(255,215,0,0.4)}
+  .pack-card.legendary-pack{background:linear-gradient(160deg,#100800,#180d00);border:1px solid rgba(255,215,0,0.18)}
+  .pack-badge{position:absolute;top:12px;right:12px;padding:4px 12px;border-radius:100px;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:700;z-index:10}
+  .pack-badge.new{background:rgba(255,45,120,0.9);color:#fff}
+  .pack-badge.hot{background:rgba(255,120,0,0.9);color:#fff}
+  .pack-badge.promo{background:rgba(34,197,94,0.9);color:#fff}
+  .pack-badge.limited{background:rgba(255,215,0,0.9);color:#000}
+
+  /* BUNDLES */
+  .bundles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .bundle-card{padding:24px;border-radius:16px;background:var(--card-bg);border:1px solid var(--border);position:relative;overflow:hidden;transition:all 0.3s;cursor:pointer}
+  .bundle-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,0.15)}
+  .bundle-card.popular{border-color:rgba(255,45,120,0.3);background:linear-gradient(160deg,#0e0818,#130a1e)}
+  .bundle-card.popular::before{content:'⭐ POPULAIRE';position:absolute;top:0;left:50%;transform:translateX(-50%);background:var(--neon-pink);color:#000;font-size:0.55rem;font-weight:700;letter-spacing:0.2em;padding:4px 16px;border-radius:0 0 8px 8px}
+  .bundle-packs{display:flex;gap:-8px;margin-bottom:16px;margin-top:8px}
+  .bpack-mini{width:44px;height:64px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;transition:transform 0.2s}
+  .bundle-card:hover .bpack-mini:nth-child(1){transform:rotate(-8deg) translateX(-4px)}
+  .bundle-card:hover .bpack-mini:nth-child(2){transform:translateY(-6px)}
+  .bundle-card:hover .bpack-mini:nth-child(3){transform:rotate(8deg) translateX(4px)}
+  .bundle-name{font-family:'Black Han Sans',sans-serif;font-size:1.1rem;color:#fff;margin-bottom:4px}
+  .bundle-desc{font-size:0.75rem;color:var(--subtext);line-height:1.5;margin-bottom:14px}
+  .bundle-footer{display:flex;align-items:center;justify-content:space-between}
+  .bundle-price-block .bundle-old{font-size:0.7rem;color:var(--subtext);text-decoration:line-through}
+  .bundle-price{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:#fff}
+  .bundle-save{font-size:0.65rem;color:#22c55e;font-weight:700}
+  .bundle-buy-btn{padding:9px 18px;background:linear-gradient(135deg,var(--neon-pink),var(--neon-purple));color:#000;font-weight:700;border:none;border-radius:8px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;transition:all 0.2s;box-shadow:0 0 14px rgba(255,45,120,0.25)}
+  .bundle-buy-btn:hover{box-shadow:0 0 24px rgba(255,45,120,0.5);transform:scale(1.04)}
+
+  /* KKD COINS */
+  .coins-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .coin-card{padding:20px;border-radius:14px;background:var(--card-bg);border:1px solid rgba(255,215,0,0.12);text-align:center;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
+  .coin-card:hover{transform:translateY(-4px);border-color:rgba(255,215,0,0.3);box-shadow:0 8px 32px rgba(255,215,0,0.1)}
+  .coin-card.best-val{border-color:rgba(255,215,0,0.4);background:linear-gradient(160deg,#140e00,#1e1400);box-shadow:0 0 24px rgba(255,215,0,0.08)}
+  .coin-card.best-val::before{content:'MEILLEURE VALEUR';position:absolute;top:0;left:50%;transform:translateX(-50%);background:var(--neon-gold);color:#000;font-size:0.5rem;font-weight:700;letter-spacing:0.2em;padding:3px 12px;border-radius:0 0 6px 6px}
+  .coin-icon{font-size:2.2rem;margin-bottom:8px;margin-top:4px}
+  .coin-amount{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--neon-gold);line-height:1;margin-bottom:4px}
+  .coin-bonus{font-size:0.6rem;color:#22c55e;font-weight:700;margin-bottom:10px}
+  .coin-price{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:#fff}
+  .coin-buy{margin-top:10px;width:100%;padding:8px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);color:var(--neon-gold);border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:700;font-family:'Noto Sans KR',sans-serif;text-transform:uppercase;letter-spacing:0.08em;transition:all 0.2s}
+  .coin-buy:hover{background:rgba(255,215,0,0.18)}
+
+  /* PAYMENT MODAL */
+  .payment-modal{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0.9);backdrop-filter:blur(16px);align-items:center;justify-content:center}
+  .payment-modal.active{display:flex}
+  .pm-inner{background:var(--card-bg2);border:1px solid rgba(255,255,255,0.1);border-radius:20px;width:100%;max-width:480px;overflow:hidden;animation:modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1)}
+  @keyframes modalIn{from{transform:scale(0.88) translateY(30px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+  .pm-header{padding:28px 28px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .pm-title{font-family:'Black Han Sans',sans-serif;font-size:1.3rem;color:#fff}
+  .pm-close{background:rgba(255,255,255,0.06);border:none;color:var(--subtext);font-size:1rem;cursor:pointer;width:30px;height:30px;border-radius:50%;transition:all 0.2s}
+  .pm-close:hover{background:rgba(255,255,255,0.12);color:#fff}
+  .pm-body{padding:24px 28px}
+  .pm-order-summary{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px;display:flex;align-items:center;gap:14px}
+  .pm-pack-preview{width:56px;height:80px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0}
+  .pm-order-info{flex:1}
+  .pm-order-name{font-family:'Black Han Sans',sans-serif;font-size:1rem;color:#fff;margin-bottom:3px}
+  .pm-order-desc{font-size:0.72rem;color:var(--subtext);margin-bottom:6px}
+  .pm-order-price{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:#fff}
+  .pm-qty-control{display:flex;align-items:center;gap:10px}
+  .qty-btn{width:28px;height:28px;border-radius:6px;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+  .qty-btn:hover{background:rgba(255,255,255,0.1);border-color:var(--neon-pink)}
+  .qty-val{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:#fff;min-width:20px;text-align:center}
+  .pm-section-label{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--subtext);margin-bottom:10px}
+  .pm-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+  .pm-method{padding:12px 8px;border-radius:10px;border:1px solid var(--border);text-align:center;cursor:pointer;transition:all 0.2s;background:rgba(255,255,255,0.02)}
+  .pm-method:hover{border-color:rgba(255,255,255,0.15)}
+  .pm-method.selected{border-color:var(--neon-pink);background:rgba(255,45,120,0.08)}
+  .pm-method-icon{font-size:1.4rem;margin-bottom:4px}
+  .pm-method-label{font-size:0.62rem;color:var(--subtext)}
+  .pm-method.selected .pm-method-label{color:var(--neon-pink)}
+  .pm-form{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+  .pm-input{padding:11px 14px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:0.85rem;outline:none;transition:border-color 0.2s}
+  .pm-input:focus{border-color:var(--neon-pink)}
+  .pm-input::placeholder{color:var(--subtext)}
+  .pm-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .pm-total{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-top:1px solid var(--border);margin-bottom:16px}
+  .pm-total-label{font-size:0.82rem;color:var(--subtext)}
+  .pm-total-val{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:#fff}
+  .pm-pay-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--neon-pink),#ff6eb4);color:#000;font-weight:700;border:none;border-radius:10px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:0.9rem;letter-spacing:0.1em;text-transform:uppercase;box-shadow:0 0 24px rgba(255,45,120,0.4);transition:all 0.3s}
+  .pm-pay-btn:hover{box-shadow:0 0 40px rgba(255,45,120,0.6);transform:translateY(-1px)}
+  .pm-security{text-align:center;margin-top:12px;font-size:0.65rem;color:var(--subtext)}
+
+  /* SUCCESS STATE */
+  .pm-success{display:none;flex-direction:column;align-items:center;padding:48px 28px;text-align:center}
+  .pm-success.show{display:flex}
+  .pm-success-icon{font-size:4rem;margin-bottom:16px;animation:successBounce 0.5s cubic-bezier(0.34,1.56,0.64,1)}
+  @keyframes successBounce{from{transform:scale(0)}to{transform:scale(1)}}
+  .pm-success-title{font-family:'Black Han Sans',sans-serif;font-size:1.6rem;color:#fff;margin-bottom:8px}
+  .pm-success-desc{font-size:0.85rem;color:var(--subtext);margin-bottom:24px}
+  .pm-success-btn{padding:13px 36px;background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));color:#000;font-weight:700;border:none;border-radius:10px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:28px;right:28px;padding:14px 20px;border-radius:10px;font-size:0.82rem;z-index:999;opacity:0;transform:translateY(16px);transition:all 0.3s;pointer-events:none;max-width:300px}
+  .toast.show{opacity:1;transform:translateY(0)}
+  .toast.success{background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:#22c55e}
+  .toast.gold{background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:var(--neon-gold)}
+  .toast.info{background:rgba(0,245,255,0.1);border:1px solid rgba(0,245,255,0.25);color:var(--neon-cyan)}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ── SHOP TABS ── */
+  .shop-tabs{display:flex;gap:4px;margin-bottom:36px;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:6px;width:fit-content;animation:fadeUp 0.4s ease both}
+  .shop-tab{padding:10px 22px;border-radius:8px;font-size:0.8rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;color:var(--subtext);font-weight:700;white-space:nowrap}
+  .shop-tab:hover{color:var(--text);background:rgba(255,255,255,0.04)}
+  .shop-tab.active{background:linear-gradient(135deg,var(--neon-pink),#ff6eb4);color:#000;box-shadow:0 0 20px rgba(255,45,120,0.3)}
+
+  /* ── KARDPOINTS STYLES ── */
+  .kp-earn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:48px}
+  .kp-earn-card{padding:20px;background:var(--card-bg);border:1px solid rgba(0,245,255,0.12);border-radius:14px;display:flex;align-items:center;gap:14px;transition:all 0.3s;cursor:default}
+  .kp-earn-card:hover{border-color:rgba(0,245,255,0.3);background:rgba(0,245,255,0.04);transform:translateY(-2px)}
+  .kp-earn-icon{width:44px;height:44px;border-radius:10px;background:rgba(0,245,255,0.08);border:1px solid rgba(0,245,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+  .kp-earn-info{flex:1}
+  .kp-earn-title{font-size:0.82rem;color:#fff;font-weight:700;margin-bottom:3px}
+  .kp-earn-desc{font-size:0.68rem;color:var(--subtext);line-height:1.4}
+  .kp-earn-pts{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--neon-cyan);flex-shrink:0;filter:drop-shadow(0 0 6px rgba(0,245,255,0.3))}
+
+  /* KardPoints purchase grid */
+  .kp-buy-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:48px}
+  .kp-buy-card{padding:20px;background:var(--card-bg);border:1px solid rgba(0,245,255,0.12);border-radius:14px;text-align:center;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
+  .kp-buy-card:hover{transform:translateY(-4px);border-color:rgba(0,245,255,0.3);box-shadow:0 8px 32px rgba(0,245,255,0.1)}
+  .kp-buy-card.best-val{border-color:rgba(0,245,255,0.4);background:linear-gradient(160deg,#001414,#001e1e);box-shadow:0 0 24px rgba(0,245,255,0.08)}
+  .kp-buy-card.best-val::before{content:'MEILLEURE VALEUR';position:absolute;top:0;left:50%;transform:translateX(-50%);background:var(--neon-cyan);color:#000;font-size:0.5rem;font-weight:700;letter-spacing:0.2em;padding:3px 12px;border-radius:0 0 6px 6px}
+  .kp-icon{font-size:2.2rem;margin-bottom:8px;margin-top:4px}
+  .kp-amount{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--neon-cyan);line-height:1;margin-bottom:4px}
+  .kp-bonus{font-size:0.6rem;color:#22c55e;font-weight:700;margin-bottom:10px;min-height:14px}
+  .kp-price{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:#fff}
+  .kp-or{font-size:0.6rem;color:var(--subtext);margin:4px 0}
+  .kp-kkd-price{font-size:0.72rem;color:var(--neon-gold);font-weight:700}
+  .kp-buy-btn{margin-top:10px;width:100%;padding:8px;background:rgba(0,245,255,0.1);border:1px solid rgba(0,245,255,0.25);color:var(--neon-cyan);border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:700;font-family:'Noto Sans KR',sans-serif;text-transform:uppercase;letter-spacing:0.08em;transition:all 0.2s}
+  .kp-buy-btn:hover{background:rgba(0,245,255,0.18)}
+
+  /* KardPoints market section */
+  .kp-market-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+  .kpm-card{border-radius:16px;overflow:hidden;cursor:pointer;transition:transform 0.3s;position:relative}
+  .kpm-card:hover{transform:translateY(-6px)}
+  .kpm-card.COMMON{background:linear-gradient(160deg,#1a2030,#2a3245);border:1px solid rgba(160,174,192,0.3)}
+  .kpm-card.RARE{background:linear-gradient(160deg,#091626,#122040);border:1.5px solid rgba(99,179,237,0.65);box-shadow:0 4px 24px rgba(99,179,237,0.2)}
+  .kpm-card.MYTHIC{background:linear-gradient(160deg,#130828,#22103e);border:2px solid rgba(199,125,255,0.7);box-shadow:0 6px 32px rgba(199,125,255,0.25)}
+  .kpm-card.LEGENDARY{background:linear-gradient(160deg,#180e00,#2c1a00);border:2px solid rgba(255,215,0,0.8);box-shadow:0 8px 40px rgba(255,215,0,0.3)}
+  .kpm-art{width:100%;height:130px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;overflow:hidden}
+  .kpm-stripe{position:absolute;top:0;left:0;right:0;height:3px}
+  .kpm-card.COMMON .kpm-stripe{background:linear-gradient(90deg,transparent,var(--common),transparent);opacity:0.4}
+  .kpm-card.RARE .kpm-stripe{background:linear-gradient(90deg,transparent,var(--rare),transparent)}
+  .kpm-card.MYTHIC .kpm-stripe{background:linear-gradient(90deg,transparent,var(--mythic),var(--neon-pink),transparent)}
+  .kpm-card.LEGENDARY .kpm-stripe{background:linear-gradient(90deg,transparent,var(--legendary),#fff,var(--legendary),transparent);animation:stripeGlow 1.3s infinite}
+  .kpm-body{padding:10px 12px 14px}
+  .kpm-group{font-size:0.5rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--subtext);margin-bottom:1px}
+  .kpm-name{font-family:'Black Han Sans',sans-serif;font-size:0.88rem;color:#fff;margin-bottom:6px}
+  .kpm-price-row{display:flex;align-items:center;justify-content:space-between}
+  .kpm-price{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--neon-cyan)}
+  .kpm-pack-price{font-size:0.5rem;color:var(--subtext);margin-top:1px}
+  .kpm-buy{padding:6px 12px;border:none;border-radius:6px;font-family:'Noto Sans KR',sans-serif;font-size:0.65rem;font-weight:700;cursor:pointer;transition:all 0.2s;background:rgba(0,245,255,0.12);color:var(--neon-cyan)}
+  .kpm-buy:hover{background:rgba(0,245,255,0.22);transform:scale(1.06)}
+  .kpm-affordable{position:absolute;top:8px;right:8px;background:rgba(34,197,94,0.85);color:#000;font-size:0.52rem;font-weight:700;padding:2px 7px;border-radius:100px;text-transform:uppercase}
+  .kpm-not-enough{opacity:0.45;cursor:not-allowed}
+  .kpm-not-enough .kpm-buy{opacity:0.4;cursor:not-allowed}
+
+  /* KP packs section */
+  .kp-packs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:48px}
+  .kp-pack-card{padding:20px 16px;background:var(--card-bg);border:1px solid rgba(0,245,255,0.12);border-radius:14px;text-align:center;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
+  .kp-pack-card:hover{transform:translateY(-4px);border-color:rgba(0,245,255,0.3);box-shadow:0 8px 28px rgba(0,245,255,0.1)}
+  .kp-pack-emoji{font-size:2.5rem;margin-bottom:10px;display:block}
+  .kp-pack-name{font-family:'Black Han Sans',sans-serif;font-size:1rem;color:#fff;margin-bottom:4px}
+  .kp-pack-desc{font-size:0.7rem;color:var(--subtext);line-height:1.4;margin-bottom:14px}
+  .kp-pack-price-row{display:flex;align-items:center;justify-content:space-between}
+  .kp-pack-pts{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--neon-cyan)}
+  .kp-pack-buy{padding:8px 16px;background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));color:#000;font-weight:700;border:none;border-radius:7px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:0.7rem;letter-spacing:0.06em;text-transform:uppercase;transition:all 0.2s}
+  .kp-pack-buy:hover{box-shadow:0 0 18px rgba(0,245,255,0.35);transform:scale(1.05)}
+  .kp-pack-card.insufficient .kp-pack-buy{background:rgba(255,255,255,0.06);color:var(--subtext);cursor:not-allowed;box-shadow:none;transform:none!important}
+
+  /* ── MARCHÉ ── */
+  .market-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
+  .market-currency-toggle{display:flex;gap:6px;align-items:center;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:5px}
+  .curr-btn{padding:8px 20px;border-radius:7px;border:none;font-family:'Noto Sans KR',sans-serif;font-size:0.78rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;color:var(--subtext);background:transparent}
+  .curr-btn.active{background:linear-gradient(135deg,var(--neon-gold),#ffaa00);color:#000;box-shadow:0 0 14px rgba(255,215,0,0.3)}
+
+  .market-filters{display:flex;gap:12px;align-items:center;margin-bottom:28px;flex-wrap:wrap}
+  .mkt-search-wrap{position:relative;flex:1;min-width:220px}
+  .mkt-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:0.4;font-size:0.9rem}
+  .mkt-search{width:100%;padding:10px 16px 10px 38px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:0.85rem;outline:none;transition:border-color 0.2s}
+  .mkt-search:focus{border-color:var(--neon-pink)}
+  .mkt-search::placeholder{color:var(--subtext)}
+  .mkt-filter-tabs{display:flex;gap:6px;flex-wrap:wrap}
+  .mft{padding:8px 14px;background:var(--card-bg);border:1px solid var(--border);border-radius:100px;font-size:0.72rem;color:var(--subtext);cursor:pointer;transition:all 0.2s;white-space:nowrap;font-weight:700}
+  .mft:hover{border-color:rgba(255,255,255,0.2);color:var(--text)}
+  .mft.active{background:var(--neon-pink);border-color:transparent;color:#000}
+  .mkt-sort{padding:9px 14px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;color:var(--subtext);font-family:'Noto Sans KR',sans-serif;font-size:0.78rem;outline:none;cursor:pointer}
+
+  /* ── MARKET GRID ── */
+  .market-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+  .market-empty{text-align:center;padding:80px 20px;color:var(--subtext)}
+
+  /* ── MARKET CARD ── */
+  .mkt-card{border-radius:16px;overflow:hidden;cursor:pointer;transition:transform 0.3s;animation:fadeUp 0.35s ease both;position:relative}
+  .mkt-card:hover{transform:translateY(-6px)}
+  .mkt-card.COMMON{background:linear-gradient(160deg,#1a2030,#2a3245);border:1px solid rgba(160,174,192,0.3)}
+  .mkt-card.RARE{background:linear-gradient(160deg,#091626,#122040);border:1.5px solid rgba(99,179,237,0.65);box-shadow:0 4px 24px rgba(99,179,237,0.2)}
+  .mkt-card.MYTHIC{background:linear-gradient(160deg,#130828,#22103e);border:2px solid rgba(199,125,255,0.7);box-shadow:0 6px 32px rgba(199,125,255,0.25)}
+  .mkt-card.LEGENDARY{background:linear-gradient(160deg,#180e00,#2c1a00);border:2px solid rgba(255,215,0,0.8);box-shadow:0 8px 40px rgba(255,215,0,0.3)}
+
+  .mkt-card-art{width:100%;height:130px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;overflow:hidden}
+  .mkt-card.RARE .mkt-card-art::after,.mkt-card.MYTHIC .mkt-card-art::after,.mkt-card.LEGENDARY .mkt-card-art::after{content:'';position:absolute;bottom:0;left:0;right:0;height:30px;filter:blur(8px)}
+  .mkt-card.RARE .mkt-card-art::after{background:rgba(99,179,237,0.15)}
+  .mkt-card.MYTHIC .mkt-card-art::after{background:rgba(199,125,255,0.2)}
+  .mkt-card.LEGENDARY .mkt-card-art::after{background:rgba(255,215,0,0.25)}
+
+  /* Holo shimmer */
+  .mkt-holo{position:absolute;inset:0;pointer-events:none}
+  .mkt-card.MYTHIC .mkt-holo{background:linear-gradient(105deg,transparent 30%,rgba(199,125,255,0.08) 50%,transparent 70%);animation:mktShimmer 3s infinite}
+  .mkt-card.LEGENDARY .mkt-holo{background:linear-gradient(105deg,transparent 20%,rgba(255,215,0,0.1) 45%,transparent 70%);animation:mktShimmer 2s infinite}
+  @keyframes mktShimmer{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+
+  /* Stripe top */
+  .mkt-stripe{position:absolute;top:0;left:0;right:0;height:3px}
+  .mkt-card.COMMON .mkt-stripe{background:linear-gradient(90deg,transparent,var(--common),transparent);opacity:0.4}
+  .mkt-card.RARE .mkt-stripe{background:linear-gradient(90deg,transparent,var(--rare),transparent)}
+  .mkt-card.MYTHIC .mkt-stripe{background:linear-gradient(90deg,transparent,var(--mythic),var(--neon-pink),transparent)}
+  .mkt-card.LEGENDARY .mkt-stripe{background:linear-gradient(90deg,transparent,var(--legendary),#fff,var(--legendary),transparent);animation:stripeGlow 1.3s infinite}
+  @keyframes stripeGlow{0%,100%{opacity:0.7}50%{opacity:1;filter:brightness(1.7)}}
+
+  .mkt-card-body{padding:12px 14px 14px}
+  .mkt-group{font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--subtext);margin-bottom:2px}
+  .mkt-name{font-family:'Black Han Sans',sans-serif;font-size:0.9rem;color:#fff;margin-bottom:6px}
+  .mkt-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:100px;font-size:0.48rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;margin-bottom:10px}
+  .mkt-card.COMMON .mkt-badge{background:rgba(160,174,192,0.1);color:var(--common);border:1px solid rgba(160,174,192,0.2)}
+  .mkt-card.RARE .mkt-badge{background:rgba(99,179,237,0.1);color:var(--rare);border:1px solid rgba(99,179,237,0.3)}
+  .mkt-card.MYTHIC .mkt-badge{background:rgba(199,125,255,0.1);color:var(--mythic);border:1px solid rgba(199,125,255,0.35)}
+  .mkt-card.LEGENDARY .mkt-badge{background:rgba(255,215,0,0.1);color:var(--legendary);border:1px solid rgba(255,215,0,0.45);box-shadow:0 0 8px rgba(255,215,0,0.2)}
+
+  .mkt-price-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .mkt-price{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;line-height:1}
+  .mkt-card.COMMON .mkt-price{color:var(--common)}
+  .mkt-card.RARE .mkt-price{color:var(--rare)}
+  .mkt-card.MYTHIC .mkt-price{color:var(--mythic)}
+  .mkt-card.LEGENDARY .mkt-price{color:var(--legendary)}
+  .mkt-price-sub{font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--subtext);margin-top:2px}
+  .mkt-buy-btn{padding:7px 14px;border:none;border-radius:7px;font-family:'Noto Sans KR',sans-serif;font-size:0.7rem;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+  .mkt-card.COMMON .mkt-buy-btn{background:rgba(160,174,192,0.15);color:var(--common)}
+  .mkt-card.RARE .mkt-buy-btn{background:rgba(99,179,237,0.15);color:var(--rare)}
+  .mkt-card.MYTHIC .mkt-buy-btn{background:rgba(199,125,255,0.15);color:var(--mythic)}
+  .mkt-card.LEGENDARY .mkt-buy-btn{background:linear-gradient(135deg,var(--legendary),#ffaa00);color:#000;box-shadow:0 0 12px rgba(255,215,0,0.3)}
+  .mkt-buy-btn:hover{transform:scale(1.06);filter:brightness(1.2)}
+
+  /* ── CARD DETAIL MODAL (marché) ── */
+  .mkt-modal{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0.88);backdrop-filter:blur(16px);align-items:center;justify-content:center}
+  .mkt-modal.active{display:flex}
+  .mkt-modal-inner{background:var(--card-bg2);border:1px solid rgba(255,255,255,0.1);border-radius:20px;width:100%;max-width:420px;overflow:hidden;animation:mktModalIn 0.35s cubic-bezier(0.34,1.56,0.64,1)}
+  @keyframes mktModalIn{from{transform:scale(0.88) translateY(30px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+  .mkt-modal-art{height:200px;display:flex;align-items:center;justify-content:center;font-size:6rem;position:relative;overflow:hidden}
+  .mkt-modal-body{padding:24px 28px 28px}
+  .mkt-modal-group{font-size:0.62rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--subtext);margin-bottom:4px}
+  .mkt-modal-name{font-family:'Black Han Sans',sans-serif;font-size:1.8rem;color:#fff;margin-bottom:6px}
+  .mkt-modal-concept{font-size:0.8rem;color:var(--subtext);margin-bottom:16px}
+  .mkt-modal-prices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+  .mkt-price-opt{padding:14px;border-radius:12px;text-align:center;cursor:pointer;transition:all 0.2s;border:2px solid transparent}
+  .mkt-price-opt:hover{transform:scale(1.03)}
+  .mkt-price-opt.kkd-opt{background:rgba(255,215,0,0.08);border-color:rgba(255,215,0,0.2)}
+  .mkt-price-opt.kkd-opt:hover{border-color:rgba(255,215,0,0.5);box-shadow:0 0 16px rgba(255,215,0,0.15)}
+  .mkt-price-opt.eur-opt{background:rgba(255,45,120,0.08);border-color:rgba(255,45,120,0.2)}
+  .mkt-price-opt.eur-opt:hover{border-color:rgba(255,45,120,0.5);box-shadow:0 0 16px rgba(255,45,120,0.15)}
+  .mkt-price-opt-val{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;line-height:1;margin-bottom:4px}
+  .mkt-price-opt.kkd-opt .mkt-price-opt-val{color:var(--neon-gold)}
+  .mkt-price-opt.eur-opt .mkt-price-opt-val{color:var(--neon-pink)}
+  .mkt-price-opt-lbl{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--subtext)}
+  .mkt-confirm-btn{width:100%;padding:14px;border:none;border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:0.88rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.3s}
+  .mkt-confirm-btn.kkd{background:linear-gradient(135deg,var(--neon-gold),#ffaa00);color:#000;box-shadow:0 0 20px rgba(255,215,0,0.3)}
+  .mkt-confirm-btn.eur{background:linear-gradient(135deg,var(--neon-pink),#ff6eb4);color:#000;box-shadow:0 0 20px rgba(255,45,120,0.3)}
+  .mkt-confirm-btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
+  .mkt-modal-close{position:absolute;top:14px;right:14px;background:rgba(0,0,0,0.4);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem;z-index:10;display:flex;align-items:center;justify-content:center}
+
+  /* ── OWNED BADGE ── */
+  .mkt-owned-badge{position:absolute;top:8px;left:8px;background:rgba(34,197,94,0.9);color:#000;font-size:0.55rem;font-weight:700;letter-spacing:0.12em;padding:3px 8px;border-radius:100px;text-transform:uppercase;z-index:10}
+  .mkt-stock{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);color:var(--subtext);font-size:0.55rem;font-weight:700;letter-spacing:0.1em;padding:3px 8px;border-radius:100px;text-transform:uppercase;z-index:10;backdrop-filter:blur(4px)}
+
+  @media(max-width:1100px){.market-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}}
+  @media(max-width:800px){.sidebar{display:none}.main{margin-left:0;padding:20px 16px 80px}.packs-grid,.bundles-grid{grid-template-columns:1fr}.coins-grid{grid-template-columns:1fr 1fr}.market-grid{grid-template-columns:repeat(2,1fr)}.shop-tabs{width:100%}.shop-tab{flex:1;text-align:center;font-size:0.7rem;padding:8px 12px}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">KpopKard<span>Drop</span></div>
+  <div class="nav-section-label">Menu</div>
+  <a class="nav-item" href="KpopKardDrop.html"><span class="ni">🏠</span> Accueil</a>
+  <a class="nav-item" href="KpopKardDrop-Collection.html"><span class="ni">🃏</span> Ma Collection</a>
+  <a class="nav-item active" href="#"><span class="ni">🛍️</span> Boutique</a>
+  <div class="nav-divider"></div>
+  <div class="nav-section-label">Social</div>
+  <a class="nav-item" href="KpopKardDrop-Social.html"><span class="ni">👥</span> Amis & Tchat</a>
+  <a class="nav-item" href="KpopKardDrop-Social.html"><span class="ni">🔄</span> Échanges</a>
+  <a class="nav-item" href="#"><span class="ni">💬</span> Communauté</a>
+  <div class="nav-divider"></div>
+  <div class="nav-section-label">Compte</div>
+  <a class="nav-item" href="#"><span class="ni">👤</span> Profil</a>
+  <a class="nav-item" href="#"><span class="ni">🏆</span> Classement</a>
+  <a class="nav-item" href="#"><span class="ni">⚙️</span> Paramètres</a>
+  <div class="coins-widget" onclick="switchShopTab('coins')">
+    <div class="coins-icon">🪙</div>
+    <div class="coins-info">
+      <div class="coins-amount" id="sidebarKKD">1 250 KKD</div>
+      <div class="coins-label">KKD Coins</div>
+    </div>
+    <div class="coins-add">+</div>
+  </div>
+  <div class="points-widget" onclick="switchShopTab('coins')">
+    <div class="coins-icon">⭐</div>
+    <div class="coins-info">
+      <div class="points-amount" id="sidebarPoints">340 pts</div>
+      <div class="points-label">KardPoints</div>
+    </div>
+    <div class="coins-add" style="color:var(--neon-cyan)">+</div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="user-avatar">K</div>
+      <div><div class="user-name">KFan2026</div><div class="user-rank">✦ Rang #142</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <!-- HEADER -->
+  <div class="page-header">
+    <div>
+      <div class="page-eyebrow">🛍️ Boutique officielle</div>
+      <div class="page-title">KpopKardDrop<br>Shop</div>
+    </div>
+    <div class="header-balance">
+      <div style="display:flex;gap:20px;align-items:flex-end">
+        <div style="text-align:right">
+          <div class="balance-label">KKD Coins</div>
+          <div class="balance-amount" id="headerKKD">🪙 1 250</div>
+        </div>
+        <div style="text-align:right">
+          <div class="balance-label">KardPoints</div>
+          <div class="balance-amount" style="color:var(--neon-cyan);filter:drop-shadow(0 0 10px rgba(0,245,255,0.3))" id="headerPoints">⭐ 340</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOP TABS -->
+  <div class="shop-tabs">
+    <div class="shop-tab active" onclick="switchShopTab('boosters')">🃏 Boosters</div>
+    <div class="shop-tab" onclick="switchShopTab('market')">🏪 Marché</div>
+    <div class="shop-tab" onclick="switchShopTab('kardpoints')">⭐ KardPoints</div>
+    <div class="shop-tab" onclick="switchShopTab('coins')">🪙 KKD Coins</div>
+  </div>
+
+  <!-- TAB: BOOSTERS -->
+  <div id="tab-boosters">
+    <!-- PROMO BANNER -->
+    <div class="promo-banner">
+      <div class="promo-text">
+        <div class="promo-tag">⚡ Offre limitée</div>
+        <div class="promo-title">Pack Légendaire × 3 — 30% de réduction</div>
+        <div class="promo-desc">Jusqu'à 3 cartes Légendaires garanties. L'occasion rêvée de compléter ta collection.</div>
+      </div>
+      <div class="promo-countdown">
+        <div class="countdown-label">Expire dans</div>
+        <div class="countdown-time" id="countdown">05:42:17</div>
+      </div>
+      <button class="promo-btn" onclick="openPayment({name:'Pack Légendaire ×3',emoji:'👑',price:'13,99',oldPrice:'19,99',color:'linear-gradient(145deg,#240e00,#381a00)',type:'pack',rarity:'legendary'})">Profiter de l'offre</button>
+    </div>
+
+    <div class="shop-section">
+      <div class="section-tag">🃏 Boosters individuels</div>
+      <div class="section-title">Choisis ton pack</div>
+      <div class="section-desc">Chaque booster contient 5 cartes. Plus le pack est rare, plus tes chances augmentent.</div>
+      <div class="packs-grid" id="packsGrid"></div>
+    </div>
+    <div class="shop-section">
+      <div class="section-tag">📦 Lots & Bundles</div>
+      <div class="section-title">Achète plus, économise plus</div>
+      <div class="section-desc">Des lots exclusifs pour remplir ta collection rapidement.</div>
+      <div class="bundles-grid" id="bundlesGrid"></div>
+    </div>
+  </div>
+
+  <!-- TAB: MARCHÉ DES CARTES -->
+  <div id="tab-market" style="display:none">
+    <div class="market-header">
+      <div>
+        <div class="section-tag">🏪 Achat direct</div>
+        <div class="section-title">Marché des cartes</div>
+        <div class="section-desc">Achète la carte de ton idol directement — avec tes KKD Coins ou en euros.</div>
+      </div>
+      <div class="market-currency-toggle">
+        <button class="curr-btn active" id="btnKKD" onclick="setCurrency('kkd')">🪙 KKD Coins</button>
+        <button class="curr-btn" id="btnEUR" onclick="setCurrency('eur')">💳 Euros</button>
+      </div>
+    </div>
+
+    <!-- Filtres marché -->
+    <div class="market-filters">
+      <div class="mkt-search-wrap">
+        <span class="mkt-search-icon">🔍</span>
+        <input type="text" id="mktSearch" class="mkt-search" placeholder="Rechercher un artiste ou un groupe..." oninput="filterMarket()">
+      </div>
+      <div class="mkt-filter-tabs">
+        <div class="mft active" onclick="setMarketRarity(this,'all')">Toutes</div>
+        <div class="mft" onclick="setMarketRarity(this,'COMMON')">🃏 Communes</div>
+        <div class="mft" onclick="setMarketRarity(this,'RARE')">💎 Rares</div>
+        <div class="mft" onclick="setMarketRarity(this,'MYTHIC')">✨ Mythiques</div>
+        <div class="mft" onclick="setMarketRarity(this,'LEGENDARY')">👑 Légendaires</div>
+      </div>
+      <select class="mkt-sort" id="mktSort" onchange="filterMarket()">
+        <option value="rarity">Trier : Rareté</option>
+        <option value="price-asc">Prix croissant</option>
+        <option value="price-desc">Prix décroissant</option>
+        <option value="name">Nom A→Z</option>
+        <option value="group">Groupe</option>
+      </select>
+    </div>
+
+    <!-- Grille de cartes -->
+    <div class="market-grid" id="marketGrid"></div>
+    <div class="market-empty" id="marketEmpty" style="display:none">
+      <div style="font-size:3rem;margin-bottom:12px">🔍</div>
+      <div style="font-family:'Black Han Sans',sans-serif;font-size:1.2rem;color:rgba(255,255,255,0.3)">Aucune carte trouvée</div>
+      <div style="font-size:0.82rem;color:var(--subtext);margin-top:6px">Essaie un autre filtre</div>
+    </div>
+  </div>
+
+  <!-- TAB: KARDPOINTS -->
+  <div id="tab-kardpoints" style="display:none">
+
+    <!-- Solde actuel -->
+    <div style="display:flex;align-items:center;gap:24px;background:linear-gradient(135deg,rgba(0,245,255,0.08),rgba(199,125,255,0.05));border:1px solid rgba(0,245,255,0.2);border-radius:16px;padding:24px 28px;margin-bottom:36px">
+      <div style="font-size:3rem">⭐</div>
+      <div style="flex:1">
+        <div style="font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--neon-cyan);margin-bottom:4px">Mon solde KardPoints</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--neon-cyan);line-height:1;filter:drop-shadow(0 0 12px rgba(0,245,255,0.4))" id="kpBalance">340 pts</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:0.7rem;color:var(--subtext);margin-bottom:4px">Prochain gain</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:#fff" id="kpNextGain">+10 pts demain</div>
+        <div style="font-size:0.62rem;color:var(--subtext);margin-top:4px">Connexion quotidienne</div>
+      </div>
+    </div>
+
+    <!-- Comment gagner des points -->
+    <div style="margin-bottom:36px">
+      <div style="font-size:0.68rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--neon-cyan);margin-bottom:16px">⭐ Comment gagner des KardPoints</div>
+      <div class="kp-earn-grid" id="kpEarnGrid"></div>
+    </div>
+
+    <!-- Acheter des KardPoints -->
+    <div style="margin-bottom:36px">
+      <div style="font-size:0.68rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--neon-cyan);margin-bottom:6px">💳 Acheter des KardPoints</div>
+      <div style="font-size:0.8rem;color:var(--subtext);margin-bottom:18px">Booste ton solde pour accéder à plus de cartes et de packs.</div>
+      <div class="kp-buy-grid" id="kpBuyGrid"></div>
+    </div>
+
+    <!-- Packs disponibles avec KardPoints -->
+    <div style="margin-bottom:36px">
+      <div style="font-size:0.68rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--neon-cyan);margin-bottom:6px">🃏 Packs disponibles</div>
+      <div style="font-size:0.8rem;color:var(--subtext);margin-bottom:18px">Échange tes KardPoints contre des boosters directement.</div>
+      <div class="kp-packs-grid" id="kpPacksGrid"></div>
+    </div>
+
+    <!-- Cartes disponibles avec KardPoints -->
+    <div>
+      <div style="font-size:0.68rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--neon-cyan);margin-bottom:6px">🎴 Cartes disponibles</div>
+      <div style="font-size:0.8rem;color:var(--subtext);margin-bottom:18px">Les cartes vertes sont à ta portée avec ton solde actuel.</div>
+      <div class="kp-market-grid" id="kpMarketGrid"></div>
+    </div>
+  </div>
+
+  <!-- TAB: COINS -->
+  <div id="tab-coins" style="display:none">
+    <div class="shop-section">
+      <div class="section-tag">🪙 KKD Coins</div>
+      <div class="section-title">Recharge ton solde</div>
+      <div class="section-desc">Les KKD Coins s'utilisent pour acheter des cartes et des boosters.</div>
+      <div class="coins-grid" id="coinsGrid"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- MARKET CARD MODAL -->
+<div class="mkt-modal" id="mktModal" onclick="if(event.target===this)closeMktModal()">
+  <div class="mkt-modal-inner">
+    <button class="mkt-modal-close" onclick="closeMktModal()">✕</button>
+    <div class="mkt-modal-art" id="mktModalArt" style="font-size:5rem"></div>
+    <div class="mkt-modal-body">
+      <div class="mkt-modal-group" id="mktModalGroup"></div>
+      <div class="mkt-modal-name" id="mktModalName"></div>
+      <div class="mkt-modal-concept" id="mktModalConcept"></div>
+      <div class="mkt-modal-prices">
+        <div class="mkt-price-opt kkd-opt" onclick="selectMktCurrency('kkd')">
+          <div class="mkt-price-opt-val" id="mktKkdPrice">50 KKD</div>
+          <div class="mkt-price-opt-lbl">🪙 KKD Coins</div>
+        </div>
+        <div class="mkt-price-opt eur-opt" onclick="selectMktCurrency('eur')" style="opacity:0.5">
+          <div class="mkt-price-opt-val" id="mktEurPrice">0,49 €</div>
+          <div class="mkt-price-opt-lbl">💳 Euros</div>
+        </div>
+      </div>
+      <button class="mkt-confirm-btn kkd" id="mktConfirmBtn" onclick="confirmMktBuy()">🪙 Acheter</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="payment-modal" id="payModal" onclick="closePayModalOutside(event)">
+  <div class="pm-inner">
+    <div id="pmFormView">
+      <div class="pm-header">
+        <div class="pm-title">Finaliser l'achat</div>
+        <button class="pm-close" onclick="closePayModal()">✕</button>
+      </div>
+      <div class="pm-body">
+        <!-- Order summary -->
+        <div class="pm-order-summary">
+          <div class="pm-pack-preview" id="pmPackPreview" style="background:linear-gradient(145deg,#1a0a2e,#2d1b4e)">📦</div>
+          <div class="pm-order-info">
+            <div class="pm-order-name" id="pmPackName">Pack Standard</div>
+            <div class="pm-order-desc" id="pmPackDesc">5 cartes · 1 Rare garantie</div>
+            <div class="pm-order-price" id="pmPackPrice">1,99 €</div>
+          </div>
+          <div class="pm-qty-control">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <div class="qty-val" id="qtyVal">1</div>
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
+
+        <!-- Payment methods -->
+        <div class="pm-section-label">Méthode de paiement</div>
+        <div class="pm-methods">
+          <div class="pm-method selected" onclick="selectMethod(this)">
+            <div class="pm-method-icon">💳</div>
+            <div class="pm-method-label">Carte</div>
+          </div>
+          <div class="pm-method" onclick="selectMethod(this)">
+            <div class="pm-method-icon">🅿️</div>
+            <div class="pm-method-label">PayPal</div>
+          </div>
+          <div class="pm-method" onclick="selectMethod(this)">
+            <div class="pm-method-icon">🍎</div>
+            <div class="pm-method-label">Apple Pay</div>
+          </div>
+        </div>
+
+        <!-- Card form -->
+        <div class="pm-form" id="pmCardForm">
+          <input class="pm-input" placeholder="Numéro de carte (1234 5678 9012 3456)" maxlength="19" oninput="formatCard(this)">
+          <div class="pm-row">
+            <input class="pm-input" placeholder="MM/AA" maxlength="5" oninput="formatExpiry(this)">
+            <input class="pm-input" placeholder="CVV" maxlength="3" type="password">
+          </div>
+          <input class="pm-input" placeholder="Nom sur la carte">
+        </div>
+
+        <!-- Total -->
+        <div class="pm-total">
+          <div class="pm-total-label">Total à payer</div>
+          <div class="pm-total-val" id="pmTotal">1,99 €</div>
+        </div>
+
+        <button class="pm-pay-btn" onclick="processPayment()">🔒 Payer maintenant</button>
+        <div class="pm-security">🔒 Paiement sécurisé par Stripe · SSL 256-bit</div>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="pm-success" id="pmSuccess">
+      <div class="pm-success-icon">🎉</div>
+      <div class="pm-success-title">Paiement réussi !</div>
+      <div class="pm-success-desc" id="pmSuccessDesc">Tes boosters ont été ajoutés à ton compte.<br>Bonne ouverture ! 🃏</div>
+      <button class="pm-success-btn" onclick="goOpen()">Ouvrir mes boosters →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ DATA ═══
+const PACKS = [
+  {id:'standard',name:'Pack Standard',desc:'Le classique pour débuter. 5 cartes avec 1 Rare garantie.',price:'1,99',rarity:'standard',emoji:'⭐',color:'standard',cards:5,guarantees:['common','rare'],badge:null},
+  {id:'rare',name:'Pack Rare',desc:'Pour les collectionneurs sérieux. 2 Rares garanties et chances Mythique augmentées.',price:'3,99',rarity:'rare',emoji:'💎',color:'rare-pack',cards:5,guarantees:['rare','rare'],badge:'hot'},
+  {id:'mythic',name:'Pack Mythique',desc:'L\'élite des packs. 1 Mythique garantie + 2 Rares. Chances Légendaire ×3.',price:'7,99',rarity:'mythic',emoji:'✨',color:'mythic-pack',cards:5,guarantees:['rare','rare','mythic'],badge:'new'},
+  {id:'legendary',name:'Pack Légendaire',desc:'Le Graal. 1 Légendaire garantie. Le pack ultime pour les vrais fans.',price:'14,99',oldPrice:'19,99',rarity:'legendary',emoji:'👑',color:'legendary-pack',cards:5,guarantees:['rare','mythic','legendary'],badge:'limited'},
+];
+
+const BUNDLES = [
+  {id:'starter',name:'Starter Bundle',desc:'5 Packs Standard + 200 KKD Coins. Parfait pour commencer ta collection.',packs:[{emoji:'⭐',bg:'linear-gradient(145deg,#200c38,#341e58)'},{emoji:'⭐',bg:'linear-gradient(145deg,#200c38,#341e58)'},{emoji:'⭐',bg:'linear-gradient(145deg,#200c38,#341e58)'}],price:'7,99',oldPrice:'9,95',save:'20%',popular:false},
+  {id:'collector',name:'Collector Bundle',desc:'3 Packs Rare + 2 Packs Mythique + 500 KKD Coins. La collection qui monte !',packs:[{emoji:'💎',bg:'linear-gradient(145deg,#0a1c30,#102840)'},{emoji:'💎',bg:'linear-gradient(145deg,#0a1c30,#102840)'},{emoji:'✨',bg:'linear-gradient(145deg,#150830,#200d48)'}],price:'24,99',oldPrice:'35,95',save:'30%',popular:true},
+  {id:'legend',name:'Legend Bundle',desc:'2 Packs Légendaires + 3 Packs Mythiques + 1000 KKD Coins. Pour les légendes.',packs:[{emoji:'👑',bg:'linear-gradient(145deg,#240e00,#381a00)'},{emoji:'✨',bg:'linear-gradient(145deg,#150830,#200d48)'},{emoji:'👑',bg:'linear-gradient(145deg,#240e00,#381a00)'}],price:'44,99',oldPrice:'64,95',save:'31%',popular:false},
+];
+
+const COINS = [
+  {amount:'500',bonus:'',price:'1,99',icon:'🪙'},
+  {amount:'1 200',bonus:'+200 bonus',price:'4,99',icon:'🪙🪙',best:false},
+  {amount:'2 800',bonus:'+800 bonus',price:'9,99',icon:'💰',best:true},
+  {amount:'6 500',bonus:'+1 500 bonus',price:'19,99',icon:'💰💰',best:false},
+];
+
+const GUAR_LABELS = {common:'🃏 Commune',rare:'💎 Rare',mythic:'✨ Mythique',legendary:'👑 Légendaire'};
+const BADGE_LABELS = {new:'NOUVEAU',hot:'🔥 POPULAIRE',promo:'PROMO',limited:'⏳ LIMITÉ'};
+
+// ═══ RENDER ═══
+function renderPacks() {
+  document.getElementById('packsGrid').innerHTML = PACKS.map((p,i)=>`
+    <div class="pack-card ${p.color}" style="animation-delay:${i*0.07}s" onclick="openPayment({name:'${p.name}',emoji:'${p.emoji}',price:'${p.price}',oldPrice:'${p.oldPrice||''}',color:'linear-gradient(145deg,#1a0a2e,#2d1b4e)',type:'pack',rarity:'${p.rarity}'})">
+      ${p.badge?`<div class="pack-badge ${p.badge}">${BADGE_LABELS[p.badge]}</div>`:''}
+      <div class="pack-visual">
+        <div class="pack-particles">${[...Array(6)].map((_,j)=>`<div class="pp" style="left:${20+j*12}%;width:${4+j%3*2}px;height:${4+j%3*2}px;background:${['#ff2d78','#c77dff','#ffd700','#00f5ff','#ff6eb4'][j%5]};animation-duration:${2+j*0.4}s;animation-delay:${j*0.3}s;bottom:10%"></div>`).join('')}</div>
+        <div class="pack-3d">
+          <div class="pack-3d-shimmer"></div>
+          <div class="pack-logo-3d">K·K·D</div>
+          <div class="pack-stars-3d">${'★'.repeat(p.rarity==='legendary'?5:p.rarity==='mythic'?4:p.rarity==='rare'?3:2)}</div>
+          <div class="pack-sub-3d">${p.name.split(' ')[1]||'Pack'}</div>
+        </div>
+      </div>
+      <div class="pack-info">
+        <div class="pack-name">${p.name}</div>
+        <div class="pack-desc">${p.desc}</div>
+        <div class="pack-guarantees">${p.guarantees.map(g=>`<div class="pack-guar ${g}">${GUAR_LABELS[g]}</div>`).join('')}</div>
+        <div class="pack-footer">
+          <div class="pack-price-block">
+            ${p.oldPrice?`<div class="pack-old-price">${p.oldPrice} €</div>`:''}
+            <div class="pack-price">${p.price} €</div>
+          </div>
+          <button class="pack-buy-btn">Acheter</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderBundles() {
+  document.getElementById('bundlesGrid').innerHTML = BUNDLES.map(b=>`
+    <div class="bundle-card ${b.popular?'popular':''}" onclick="openPayment({name:'${b.name}',emoji:'📦',price:'${b.price}',oldPrice:'${b.oldPrice}',color:'linear-gradient(145deg,#1a0a2e,#2d1b4e)',type:'bundle'})">
+      <div class="bundle-packs">${b.packs.map(p=>`<div class="bpack-mini" style="background:${p.bg}">${p.emoji}</div>`).join('')}</div>
+      <div class="bundle-name">${b.name}</div>
+      <div class="bundle-desc">${b.desc}</div>
+      <div class="bundle-footer">
+        <div class="bundle-price-block">
+          <div class="bundle-old">${b.oldPrice} €</div>
+          <div class="bundle-price">${b.price} €</div>
+          <div class="bundle-save">Économise ${b.save}</div>
+        </div>
+        <button class="bundle-buy-btn">Acheter</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderCoins() {
+  document.getElementById('coinsGrid').innerHTML = COINS.map(c=>`
+    <div class="coin-card ${c.best?'best-val':''}" onclick="openPayment({name:'${c.amount} KKD Coins',emoji:'🪙',price:'${c.price}',color:'linear-gradient(145deg,#1c1400,#2a1e00)',type:'coins'})">
+      <div class="coin-icon">${c.icon}</div>
+      <div class="coin-amount">${c.amount}</div>
+      ${c.bonus?`<div class="coin-bonus">+ ${c.bonus}</div>`:`<div style="height:18px"></div>`}
+      <div class="coin-price">${c.price} €</div>
+      <button class="coin-buy">Acheter</button>
+    </div>`).join('');
+}
+
+// ═══ PAYMENT MODAL ═══
+let currentItem = null;
+let currentQty = 1;
+let basePrice = 0;
+
+function openPayment(item) {
+  currentItem = item;
+  currentQty = 1;
+  basePrice = parseFloat(item.price.replace(',','.'));
+  document.getElementById('pmPackPreview').style.background = item.color;
+  document.getElementById('pmPackPreview').textContent = item.emoji;
+  document.getElementById('pmPackName').textContent = item.name;
+  document.getElementById('pmPackDesc').textContent = item.type==='coins'?'Crédits KKD utilisables dans la boutique':item.type==='bundle'?'Bundle exclusif · Meilleure valeur':'5 cartes · Pack ' + (item.rarity||'');
+  document.getElementById('qtyVal').textContent = 1;
+  updateTotal();
+  document.getElementById('pmFormView').style.display = 'block';
+  document.getElementById('pmSuccess').classList.remove('show');
+  document.getElementById('payModal').classList.add('active');
+}
+
+function changeQty(delta) {
+  currentQty = Math.max(1, Math.min(10, currentQty + delta));
+  document.getElementById('qtyVal').textContent = currentQty;
+  updateTotal();
+}
+
+function updateTotal() {
+  const total = (basePrice * currentQty).toFixed(2).replace('.',',');
+  document.getElementById('pmTotal').textContent = total + ' €';
+  document.getElementById('pmPackPrice').textContent = basePrice.toFixed(2).replace('.',',') + ' €';
+}
+
+function selectMethod(el) {
+  document.querySelectorAll('.pm-method').forEach(m=>m.classList.remove('selected'));
+  el.classList.add('selected');
+  const label = el.querySelector('.pm-method-label').textContent;
+  document.getElementById('pmCardForm').style.display = label==='Carte'?'flex':'none';
+}
+
+function processPayment() {
+  const btn = document.querySelector('.pm-pay-btn');
+  btn.textContent = '⏳ Traitement en cours...';
+  btn.disabled = true;
+  setTimeout(()=>{
+    document.getElementById('pmFormView').style.display = 'none';
+    const s = document.getElementById('pmSuccess');
+    s.classList.add('show');
+    const total = (basePrice * currentQty).toFixed(2).replace('.',',');
+    document.getElementById('pmSuccessDesc').innerHTML = `
+      <b>${currentQty} × ${currentItem.name}</b> — ${total} €<br>
+      ${currentItem.type==='coins'?'Tes KKD Coins ont été crédités ! 🪙':'Tes boosters t\'attendent ! Lance une ouverture 🃏'}`;
+    btn.textContent = '🔒 Payer maintenant';
+    btn.disabled = false;
+  },1800);
+}
+
+function goOpen() {
+  closePayModal();
+  window.location.href = 'KpopKardDrop.html';
+}
+
+function closePayModal() { document.getElementById('payModal').classList.remove('active'); }
+function closePayModalOutside(e) { if(e.target===document.getElementById('payModal')) closePayModal(); }
+
+// Card input formatting
+function formatCard(el) {
+  let v = el.value.replace(/\D/g,'').substring(0,16);
+  el.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+function formatExpiry(el) {
+  let v = el.value.replace(/\D/g,'');
+  if(v.length>2) v = v.substring(0,2)+'/'+v.substring(2,4);
+  el.value = v;
+}
+
+// ═══ SHOP TABS ═══
+function switchShopTab(tab) {
+  const tabs = ['boosters','market','kardpoints','coins'];
+  document.querySelectorAll('.shop-tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === tab));
+  document.getElementById('tab-boosters').style.display    = tab==='boosters'    ? 'block':'none';
+  document.getElementById('tab-market').style.display      = tab==='market'      ? 'block':'none';
+  document.getElementById('tab-kardpoints').style.display  = tab==='kardpoints'  ? 'block':'none';
+  document.getElementById('tab-coins').style.display       = tab==='coins'       ? 'block':'none';
+  if (tab==='market'     && MARKET_CARDS.length===0) buildMarketCards();
+  if (tab==='kardpoints' && !kpBuilt) buildKardPoints();
+}
+
+// ═══ KARDPOINTS SYSTEM ═══
+let userKardPoints = 340; // Simulé — viendra de l'API
+let kpBuilt = false;
+
+const KP_EARN_WAYS = [
+  {icon:'🔑',title:'Connexion quotidienne',desc:'Reviens chaque jour pour gagner des points',pts:'+10 pts'},
+  {icon:'🎴',title:'Ouvrir un booster',desc:'Chaque booster ouvert te rapporte des points',pts:'+5 pts'},
+  {icon:'🔄',title:'Échange complété',desc:'Finalise un échange avec un autre joueur',pts:'+15 pts'},
+  {icon:'🔥',title:'Streak 7 jours',desc:'7 connexions consécutives = gros bonus',pts:'+50 pts'},
+  {icon:'👥',title:'Inviter un ami',desc:'Ton ami rejoint KpopKardDrop via ton lien',pts:'+30 pts'},
+  {icon:'🏆',title:'Monter de rang',desc:'Chaque nouveau rang dans le classement',pts:'+20 pts'},
+  {icon:'💬',title:'Premier message du jour',desc:'Envoie un message dans le tchat',pts:'+2 pts'},
+  {icon:'🌟',title:'Collection complète',desc:'Obtiens toutes les cartes d\'un groupe',pts:'+100 pts'},
+];
+
+const KP_BUY_OPTIONS = [
+  {pts:200,  bonus:'',     price:'0,99', kkd:100,  icon:'⭐'},
+  {pts:500,  bonus:'',     price:'1,99', kkd:250,  icon:'⭐⭐'},
+  {pts:1200, bonus:'+200 bonus', price:'3,99', kkd:600, icon:'🌟', best:false},
+  {pts:3000, bonus:'+500 bonus', price:'7,99', kkd:1500,icon:'💫', best:true},
+];
+
+const KP_PACKS = [
+  {emoji:'⭐',name:'Pack Standard',desc:'5 cartes · 1 Rare garantie',pts:150,type:'standard'},
+  {emoji:'💎',name:'Pack Rare',desc:'5 cartes · 2 Rares garanties',pts:400,type:'rare'},
+  {emoji:'✨',name:'Pack Mythique',desc:'5 cartes · 1 Mythique garantie',pts:900,type:'mythic'},
+  {emoji:'👑',name:'Pack Légendaire',desc:'5 cartes · 1 Légendaire garantie',pts:2000,type:'legendary'},
+];
+
+// Cartes achetables avec KardPoints
+const KP_MARKET_CARDS = [
+  {group:'SEVENTEEN',name:'Dino',rarity:'COMMON',emoji:'🦕',bg:'linear-gradient(160deg,#080810,#101018)',pts:30},
+  {group:'GOT7',name:'BamBam',rarity:'COMMON',emoji:'💫',bg:'linear-gradient(160deg,#080810,#101018)',pts:30},
+  {group:'NMIXX',name:'Lily',rarity:'COMMON',emoji:'🌸',bg:'linear-gradient(160deg,#000a10,#001018)',pts:30},
+  {group:'ENHYPEN',name:'Sunoo',rarity:'COMMON',emoji:'☀️',bg:'linear-gradient(160deg,#000818,#001028)',pts:30},
+  {group:'MONSTA X',name:'Shownu',rarity:'COMMON',emoji:'💪',bg:'linear-gradient(160deg,#080808,#101010)',pts:30},
+  {group:'Stray Kids',name:'Seungmin',rarity:'COMMON',emoji:'⚾',bg:'linear-gradient(160deg,#00080f,#00101e)',pts:30},
+  {group:'NCT',name:'Jaehyun',rarity:'RARE',emoji:'💙',bg:'linear-gradient(160deg,#050510,#0a0a20)',pts:100},
+  {group:'Stray Kids',name:'Felix',rarity:'RARE',emoji:'🔥',bg:'linear-gradient(160deg,#001018,#001828)',pts:100},
+  {group:'TWICE',name:'Sana',rarity:'RARE',emoji:'🐹',bg:'linear-gradient(160deg,#001808,#002e12)',pts:100},
+  {group:'ENHYPEN',name:'Ni-ki',rarity:'RARE',emoji:'🌙',bg:'linear-gradient(160deg,#000818,#001028)',pts:100},
+  {group:'IVE',name:'Yujin',rarity:'RARE',emoji:'💚',bg:'linear-gradient(160deg,#001818,#002e2e)',pts:100},
+  {group:'LE SSERAFIM',name:'Sakura',rarity:'RARE',emoji:'🌸',bg:'linear-gradient(160deg,#180005,#280008)',pts:100},
+  {group:'aespa',name:'Karina',rarity:'MYTHIC',emoji:'🤖',bg:'linear-gradient(160deg,#0a0a1a,#15152e)',pts:280},
+  {group:'TXT',name:'Yeonjun',rarity:'MYTHIC',emoji:'🦋',bg:'linear-gradient(160deg,#080018,#100028)',pts:280},
+  {group:'MAMAMOO',name:'Hwasa',rarity:'MYTHIC',emoji:'🔮',bg:'linear-gradient(160deg,#080008,#100010)',pts:280},
+  {group:'Red Velvet',name:'Irene',rarity:'MYTHIC',emoji:'🌹',bg:'linear-gradient(160deg,#1a0a0a,#2e1515)',pts:280},
+  {group:'BTS',name:'V',rarity:'LEGENDARY',emoji:'🎨',bg:'linear-gradient(160deg,#040a14,#080e20)',pts:700},
+  {group:'BIGBANG',name:'G-Dragon',rarity:'LEGENDARY',emoji:'👁',bg:'linear-gradient(160deg,#08000f,#12001e)',pts:700},
+];
+
+function buildKardPoints() {
+  kpBuilt = true;
+  updateKpBalance();
+
+  // Comment gagner
+  document.getElementById('kpEarnGrid').innerHTML = KP_EARN_WAYS.map(w => `
+    <div class="kp-earn-card">
+      <div class="kp-earn-icon">${w.icon}</div>
+      <div class="kp-earn-info">
+        <div class="kp-earn-title">${w.title}</div>
+        <div class="kp-earn-desc">${w.desc}</div>
+      </div>
+      <div class="kp-earn-pts">${w.pts}</div>
+    </div>`).join('');
+
+  // Acheter des points
+  document.getElementById('kpBuyGrid').innerHTML = KP_BUY_OPTIONS.map(o => `
+    <div class="kp-buy-card ${o.best?'best-val':''}" onclick="buyKardPoints(${o.pts},'${o.price}')">
+      <div class="kp-icon">⭐</div>
+      <div class="kp-amount">${o.pts.toLocaleString()}</div>
+      <div class="kp-bonus">${o.bonus||'&nbsp;'}</div>
+      <div class="kp-price">${o.price} €</div>
+      <div class="kp-or">ou</div>
+      <div class="kp-kkd-price">🪙 ${o.kkd} KKD</div>
+      <button class="kp-buy-btn">Acheter</button>
+    </div>`).join('');
+
+  // Packs
+  document.getElementById('kpPacksGrid').innerHTML = KP_PACKS.map(p => {
+    const canAfford = userKardPoints >= p.pts;
+    return `
+    <div class="kp-pack-card ${!canAfford?'insufficient':''}" onclick="${canAfford?`buyPackWithPoints('${p.type}',${p.pts})`:'showKpToast(\'Pas assez de KardPoints !\',\'error\')'}">
+      <span class="kp-pack-emoji">${p.emoji}</span>
+      <div class="kp-pack-name">${p.name}</div>
+      <div class="kp-pack-desc">${p.desc}</div>
+      <div class="kp-pack-price-row">
+        <div class="kp-pack-pts">⭐ ${p.pts.toLocaleString()} pts</div>
+        <button class="kp-pack-buy">${canAfford?'Acheter':'🔒'}</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Cartes du marché KP
+  renderKpMarket();
+}
+
+function renderKpMarket() {
+  document.getElementById('kpMarketGrid').innerHTML = KP_MARKET_CARDS.map((c,i) => {
+    const canAfford = userKardPoints >= c.pts;
+    const RARITY_ICONS  = {COMMON:'🃏',RARE:'💎',MYTHIC:'✨',LEGENDARY:'👑'};
+    return `
+    <div class="kpm-card ${c.rarity} ${!canAfford?'kpm-not-enough':''}" style="animation-delay:${i*0.03}s">
+      <div class="kpm-stripe"></div>
+      ${canAfford?`<div class="kpm-affordable">✓ À portée</div>`:''}
+      <div class="kpm-art" style="background:${c.bg}">${c.emoji}</div>
+      <div class="kpm-body">
+        <div class="kpm-group">${c.group}</div>
+        <div class="kpm-name">${c.name}</div>
+        <div class="kpm-price-row">
+          <div>
+            <div class="kpm-price">⭐ ${c.pts} pts</div>
+            <div class="kpm-pack-price">${RARITY_ICONS[c.rarity]} ${c.rarity}</div>
+          </div>
+          <button class="kpm-buy" onclick="${canAfford?`buyCardWithPoints('${c.group}','${c.name}',${c.pts})`:'showKpToast(\'Pas assez de points !\',\'error\')'}">${canAfford?'Acheter':'🔒'}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateKpBalance() {
+  document.getElementById('kpBalance').textContent    = `${userKardPoints.toLocaleString()} pts`;
+  document.getElementById('sidebarPoints').textContent = `${userKardPoints.toLocaleString()} pts`;
+  document.getElementById('headerPoints').textContent  = `⭐ ${userKardPoints.toLocaleString()}`;
+}
+
+function buyKardPoints(pts, price) {
+  showKpToast(`Redirection vers le paiement pour ${pts} KardPoints (${price} €)...`, 'info');
+}
+
+function buyPackWithPoints(type, cost) {
+  if (userKardPoints < cost) { showKpToast('Pas assez de KardPoints !', 'error'); return; }
+  userKardPoints -= cost;
+  updateKpBalance();
+  buildKardPoints(); // refresh
+  showKpToast(`🎴 Pack ${type} acheté ! Ouvre-le depuis l'accueil.`, 'success');
+}
+
+function buyCardWithPoints(group, name, cost) {
+  if (userKardPoints < cost) { showKpToast('Pas assez de KardPoints !', 'error'); return; }
+  userKardPoints -= cost;
+  updateKpBalance();
+  renderKpMarket();
+  showKpToast(`✅ ${name} (${group}) ajoutée à ta collection !`, 'success');
+}
+
+function showKpToast(msg, type='success') {
+  if (window.KKD) { KKD.UI.toast(msg, type); return; }
+  const t = document.getElementById('toast');
+  if (t) { t.textContent=msg; t.className=`toast ${type} show`; setTimeout(()=>t.classList.remove('show'),3000); }
+}
+const PRICES = {
+  COMMON:    { kkd: 50,   eur: '0,49' },
+  RARE:      { kkd: 150,  eur: '0,99' },
+  MYTHIC:    { kkd: 400,  eur: '2,49' },
+  LEGENDARY: { kkd: 1000, eur: '4,99' },
+};
+const RARITY_ICONS  = { COMMON:'🃏', RARE:'💎', MYTHIC:'✨', LEGENDARY:'👑' };
+const RARITY_LABELS = { COMMON:'Commune', RARE:'Rare', MYTHIC:'Mythique', LEGENDARY:'Légendaire' };
+
+// ═══ CATALOGUE DU MARCHÉ ═══
+const MARKET_CARDS = [];
+let marketRarity   = 'all';
+let marketCurrency = 'kkd';
+let selectedMktCard = null;
+let selectedMktCurrency = 'kkd';
+
+// On génère les cartes du marché depuis le catalogue d'artistes
+const MARKET_ARTISTS = [
+  // BTS
+  {group:'BTS',name:'RM',rarity:'RARE',emoji:'📚',bg:'linear-gradient(160deg,#080010,#120018)'},
+  {group:'BTS',name:'Jin',rarity:'LEGENDARY',emoji:'🌸',bg:'linear-gradient(160deg,#1a0020,#2e0040)'},
+  {group:'BTS',name:'Suga',rarity:'RARE',emoji:'🎹',bg:'linear-gradient(160deg,#06060e,#0e0e18)'},
+  {group:'BTS',name:'J-Hope',rarity:'MYTHIC',emoji:'☀️',bg:'linear-gradient(160deg,#0e0800,#1e1200)'},
+  {group:'BTS',name:'Jimin',rarity:'MYTHIC',emoji:'🌙',bg:'linear-gradient(160deg,#100010,#1c001c)'},
+  {group:'BTS',name:'V',rarity:'LEGENDARY',emoji:'🎨',bg:'linear-gradient(160deg,#040a14,#080e20)'},
+  {group:'BTS',name:'Jungkook',rarity:'MYTHIC',emoji:'🐰',bg:'linear-gradient(160deg,#080010,#100018)'},
+  // BLACKPINK
+  {group:'BLACKPINK',name:'Jisoo',rarity:'RARE',emoji:'🌸',bg:'linear-gradient(160deg,#120005,#200008)'},
+  {group:'BLACKPINK',name:'Jennie',rarity:'LEGENDARY',emoji:'🖤',bg:'linear-gradient(160deg,#1a0008,#300015)'},
+  {group:'BLACKPINK',name:'Rosé',rarity:'RARE',emoji:'🌹',bg:'linear-gradient(160deg,#12000a,#200010)'},
+  {group:'BLACKPINK',name:'Lisa',rarity:'MYTHIC',emoji:'🐱',bg:'linear-gradient(160deg,#0f0008,#1e0012)'},
+  // TWICE
+  {group:'TWICE',name:'Nayeon',rarity:'MYTHIC',emoji:'🐰',bg:'linear-gradient(160deg,#001808,#002e12)'},
+  {group:'TWICE',name:'Jihyo',rarity:'RARE',emoji:'🎤',bg:'linear-gradient(160deg,#001808,#002e12)'},
+  {group:'TWICE',name:'Momo',rarity:'RARE',emoji:'🍑',bg:'linear-gradient(160deg,#001808,#002e12)'},
+  {group:'TWICE',name:'Sana',rarity:'RARE',emoji:'🐹',bg:'linear-gradient(160deg,#001808,#002e12)'},
+  {group:'TWICE',name:'Mina',rarity:'MYTHIC',emoji:'🩰',bg:'linear-gradient(160deg,#001808,#002e12)'},
+  {group:'TWICE',name:'Tzuyu',rarity:'RARE',emoji:'🏹',bg:'linear-gradient(160deg,#001808,#002e12)'},
+  // aespa
+  {group:'aespa',name:'Karina',rarity:'MYTHIC',emoji:'🤖',bg:'linear-gradient(160deg,#0a0a1a,#15152e)'},
+  {group:'aespa',name:'Winter',rarity:'RARE',emoji:'❄️',bg:'linear-gradient(160deg,#0a0a1a,#15152e)'},
+  {group:'aespa',name:'Giselle',rarity:'RARE',emoji:'💜',bg:'linear-gradient(160deg,#0a0a1a,#15152e)'},
+  {group:'aespa',name:'NingNing',rarity:'RARE',emoji:'⭐',bg:'linear-gradient(160deg,#0a0a1a,#15152e)'},
+  // Stray Kids
+  {group:'Stray Kids',name:'Bang Chan',rarity:'RARE',emoji:'🌊',bg:'linear-gradient(160deg,#00080f,#00101e)'},
+  {group:'Stray Kids',name:'Felix',rarity:'RARE',emoji:'🔥',bg:'linear-gradient(160deg,#001018,#001828)'},
+  {group:'Stray Kids',name:'Hyunjin',rarity:'MYTHIC',emoji:'🎨',bg:'linear-gradient(160deg,#00080f,#00101e)'},
+  {group:'Stray Kids',name:'Han',rarity:'RARE',emoji:'✍️',bg:'linear-gradient(160deg,#00080f,#00101e)'},
+  // SEVENTEEN
+  {group:'SEVENTEEN',name:'Woozi',rarity:'RARE',emoji:'🎹',bg:'linear-gradient(160deg,#080810,#101018)'},
+  {group:'SEVENTEEN',name:'Hoshi',rarity:'MYTHIC',emoji:'🐯',bg:'linear-gradient(160deg,#080810,#101018)'},
+  {group:'SEVENTEEN',name:'Joshua',rarity:'RARE',emoji:'🎸',bg:'linear-gradient(160deg,#080810,#101018)'},
+  {group:'SEVENTEEN',name:'Mingyu',rarity:'RARE',emoji:'⭐',bg:'linear-gradient(160deg,#080810,#101018)'},
+  {group:'SEVENTEEN',name:'Jeonghan',rarity:'MYTHIC',emoji:'🌸',bg:'linear-gradient(160deg,#080810,#101018)'},
+  // NewJeans
+  {group:'NewJeans',name:'Hanni',rarity:'MYTHIC',emoji:'🎀',bg:'linear-gradient(160deg,#0a001a,#15002e)'},
+  {group:'NewJeans',name:'Minji',rarity:'RARE',emoji:'🌸',bg:'linear-gradient(160deg,#080015,#100022)'},
+  {group:'NewJeans',name:'Danielle',rarity:'RARE',emoji:'💜',bg:'linear-gradient(160deg,#080015,#100022)'},
+  {group:'NewJeans',name:'Haerin',rarity:'RARE',emoji:'🐱',bg:'linear-gradient(160deg,#080015,#100022)'},
+  {group:'NewJeans',name:'Hyein',rarity:'COMMON',emoji:'🌟',bg:'linear-gradient(160deg,#080015,#100022)'},
+  // IVE
+  {group:'IVE',name:'Wonyoung',rarity:'LEGENDARY',emoji:'🌺',bg:'linear-gradient(160deg,#001818,#002e2e)'},
+  {group:'IVE',name:'Yujin',rarity:'RARE',emoji:'💚',bg:'linear-gradient(160deg,#001818,#002e2e)'},
+  {group:'IVE',name:'Rei',rarity:'RARE',emoji:'🌸',bg:'linear-gradient(160deg,#001818,#002e2e)'},
+  {group:'IVE',name:'Gaeul',rarity:'RARE',emoji:'🌿',bg:'linear-gradient(160deg,#001818,#002e2e)'},
+  // LE SSERAFIM
+  {group:'LE SSERAFIM',name:'Kazuha',rarity:'MYTHIC',emoji:'🍂',bg:'linear-gradient(160deg,#1a0800,#2e1500)'},
+  {group:'LE SSERAFIM',name:'Sakura',rarity:'RARE',emoji:'🌸',bg:'linear-gradient(160deg,#180005,#280008)'},
+  {group:'LE SSERAFIM',name:'Chaewon',rarity:'RARE',emoji:'💗',bg:'linear-gradient(160deg,#180005,#280008)'},
+  // ENHYPEN
+  {group:'ENHYPEN',name:'Ni-ki',rarity:'RARE',emoji:'🌙',bg:'linear-gradient(160deg,#000818,#001028)'},
+  {group:'ENHYPEN',name:'Jungwon',rarity:'RARE',emoji:'⭐',bg:'linear-gradient(160deg,#000818,#001028)'},
+  {group:'ENHYPEN',name:'Heeseung',rarity:'RARE',emoji:'💙',bg:'linear-gradient(160deg,#000818,#001028)'},
+  // TXT
+  {group:'TXT',name:'Yeonjun',rarity:'MYTHIC',emoji:'🦋',bg:'linear-gradient(160deg,#080018,#100028)'},
+  {group:'TXT',name:'Soobin',rarity:'RARE',emoji:'🐰',bg:'linear-gradient(160deg,#080018,#100028)'},
+  {group:'TXT',name:'Beomgyu',rarity:'RARE',emoji:'🎸',bg:'linear-gradient(160deg,#080018,#100028)'},
+  // ATEEZ
+  {group:'ATEEZ',name:'Hongjoong',rarity:'RARE',emoji:'🎤',bg:'linear-gradient(160deg,#100005,#1c0008)'},
+  {group:'ATEEZ',name:'San',rarity:'MYTHIC',emoji:'🐯',bg:'linear-gradient(160deg,#100005,#1c0008)'},
+  {group:'ATEEZ',name:'Wooyoung',rarity:'RARE',emoji:'💃',bg:'linear-gradient(160deg,#100005,#1c0008)'},
+  // (G)I-DLE
+  {group:'(G)I-DLE',name:'Soyeon',rarity:'MYTHIC',emoji:'🔥',bg:'linear-gradient(160deg,#0a0800,#181200)'},
+  {group:'(G)I-DLE',name:'Minnie',rarity:'RARE',emoji:'🌻',bg:'linear-gradient(160deg,#0a0800,#181200)'},
+  {group:'(G)I-DLE',name:'Miyeon',rarity:'RARE',emoji:'🌸',bg:'linear-gradient(160deg,#0a0800,#181200)'},
+  // BIGBANG
+  {group:'BIGBANG',name:'G-Dragon',rarity:'LEGENDARY',emoji:'👁',bg:'linear-gradient(160deg,#08000f,#12001e)'},
+  {group:'BIGBANG',name:'Taeyang',rarity:'MYTHIC',emoji:'☀️',bg:'linear-gradient(160deg,#08000f,#12001e)'},
+  {group:'BIGBANG',name:'T.O.P',rarity:'RARE',emoji:'🎩',bg:'linear-gradient(160deg,#08000f,#12001e)'},
+  // Red Velvet
+  {group:'Red Velvet',name:'Irene',rarity:'MYTHIC',emoji:'🌹',bg:'linear-gradient(160deg,#1a0a0a,#2e1515)'},
+  {group:'Red Velvet',name:'Seulgi',rarity:'RARE',emoji:'🐻',bg:'linear-gradient(160deg,#1a0a0a,#2e1515)'},
+  {group:'Red Velvet',name:'Wendy',rarity:'RARE',emoji:'🌸',bg:'linear-gradient(160deg,#1a0a0a,#2e1515)'},
+  // EXO
+  {group:'EXO',name:'Baekhyun',rarity:'RARE',emoji:'⭐',bg:'linear-gradient(160deg,#060614,#0e0e22)'},
+  {group:'EXO',name:'Kai',rarity:'MYTHIC',emoji:'🐻',bg:'linear-gradient(160deg,#060614,#0e0e22)'},
+  {group:'EXO',name:'Sehun',rarity:'RARE',emoji:'🌬️',bg:'linear-gradient(160deg,#060614,#0e0e22)'},
+  // MAMAMOO
+  {group:'MAMAMOO',name:'Hwasa',rarity:'MYTHIC',emoji:'🔮',bg:'linear-gradient(160deg,#080008,#100010)'},
+  {group:'MAMAMOO',name:'Solar',rarity:'RARE',emoji:'☀️',bg:'linear-gradient(160deg,#080008,#100010)'},
+  // NCT
+  {group:'NCT',name:'Taeyong',rarity:'MYTHIC',emoji:'🖤',bg:'linear-gradient(160deg,#050510,#0a0a20)'},
+  {group:'NCT',name:'Jaehyun',rarity:'RARE',emoji:'💙',bg:'linear-gradient(160deg,#050510,#0a0a20)'},
+  {group:'NCT',name:'Haechan',rarity:'RARE',emoji:'☀️',bg:'linear-gradient(160deg,#050510,#0a0a20)'},
+  // ITZY
+  {group:'ITZY',name:'Yeji',rarity:'RARE',emoji:'🐱',bg:'linear-gradient(160deg,#100010,#200020)'},
+  {group:'ITZY',name:'Ryujin',rarity:'MYTHIC',emoji:'🔥',bg:'linear-gradient(160deg,#100010,#200020)'},
+  // NMIXX
+  {group:'NMIXX',name:'Sullyoon',rarity:'RARE',emoji:'🌊',bg:'linear-gradient(160deg,#000a10,#001018)'},
+  {group:'NMIXX',name:'Lily',rarity:'COMMON',emoji:'🌸',bg:'linear-gradient(160deg,#000a10,#001018)'},
+  // ZEROBASEONE
+  {group:'ZEROBASEONE',name:'Zhang Hao',rarity:'RARE',emoji:'🌟',bg:'linear-gradient(160deg,#000a18,#001228)'},
+  {group:'ZEROBASEONE',name:'Sung Han-bin',rarity:'RARE',emoji:'💙',bg:'linear-gradient(160deg,#000a18,#001228)'},
+  // ILLIT
+  {group:'ILLIT',name:'Wonhee',rarity:'RARE',emoji:'🌸',bg:'linear-gradient(160deg,#0a0010,#14001e)'},
+  {group:'ILLIT',name:'Minju',rarity:'RARE',emoji:'💜',bg:'linear-gradient(160deg,#0a0010,#14001e)'},
+  // Communes variées
+  {group:'SEVENTEEN',name:'Dino',rarity:'COMMON',emoji:'🦕',bg:'linear-gradient(160deg,#080810,#101018)'},
+  {group:'GOT7',name:'BamBam',rarity:'COMMON',emoji:'💫',bg:'linear-gradient(160deg,#080808,#101010)'},
+  {group:'MONSTA X',name:'Shownu',rarity:'COMMON',emoji:'💪',bg:'linear-gradient(160deg,#080808,#101010)'},
+  {group:'Stray Kids',name:'Seungmin',rarity:'COMMON',emoji:'⚾',bg:'linear-gradient(160deg,#00080f,#00101e)'},
+  {group:'ENHYPEN',name:'Sunoo',rarity:'COMMON',emoji:'☀️',bg:'linear-gradient(160deg,#000818,#001028)'},
+];
+
+// Concepts de cartes
+const CONCEPTS = ['Portrait Officiel','Stage Performance','Music Video','Concept Photo','Award Show','Behind The Scene','Magazine Cover','World Tour'];
+
+function buildMarketCards() {
+  MARKET_CARDS.length = 0;
+  MARKET_ARTISTS.forEach((a, i) => {
+    const concept = CONCEPTS[i % CONCEPTS.length];
+    MARKET_CARDS.push({
+      id:      `mkt-${i}`,
+      group:   a.group,
+      name:    a.name,
+      concept,
+      rarity:  a.rarity,
+      emoji:   a.emoji,
+      bg:      a.bg,
+      kkd:     PRICES[a.rarity].kkd,
+      eur:     PRICES[a.rarity].eur,
+      owned:   Math.random() > 0.75, // Simulé
+      stock:   Math.floor(Math.random() * 50) + 5,
+    });
+  });
+  filterMarket();
+}
+
+function setMarketRarity(el, r) {
+  document.querySelectorAll('.mft').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  marketRarity = r;
+  filterMarket();
+}
+
+function setCurrency(c) {
+  marketCurrency = c;
+  document.getElementById('btnKKD').classList.toggle('active', c === 'kkd');
+  document.getElementById('btnEUR').classList.toggle('active', c === 'eur');
+  filterMarket();
+}
+
+function filterMarket() {
+  if (MARKET_CARDS.length === 0) return;
+  const search = document.getElementById('mktSearch').value.toLowerCase();
+  const sort   = document.getElementById('mktSort').value;
+  const RARITY_ORDER = { LEGENDARY:0, MYTHIC:1, RARE:2, COMMON:3 };
+
+  let cards = [...MARKET_CARDS];
+  if (marketRarity !== 'all') cards = cards.filter(c => c.rarity === marketRarity);
+  if (search) cards = cards.filter(c =>
+    c.name.toLowerCase().includes(search) || c.group.toLowerCase().includes(search)
+  );
+
+  if (sort === 'rarity')      cards.sort((a,b) => RARITY_ORDER[a.rarity] - RARITY_ORDER[b.rarity]);
+  else if (sort === 'price-asc')  cards.sort((a,b) => a.kkd - b.kkd);
+  else if (sort === 'price-desc') cards.sort((a,b) => b.kkd - a.kkd);
+  else if (sort === 'name')       cards.sort((a,b) => a.name.localeCompare(b.name));
+  else if (sort === 'group')      cards.sort((a,b) => a.group.localeCompare(b.group));
+
+  const grid  = document.getElementById('marketGrid');
+  const empty = document.getElementById('marketEmpty');
+
+  if (!cards.length) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const priceDisplay = c => marketCurrency === 'kkd'
+    ? `${c.kkd.toLocaleString()} KKD`
+    : `${c.eur} €`;
+  const btnLabel = marketCurrency === 'kkd' ? '🪙 Acheter' : '💳 Acheter';
+
+  grid.innerHTML = cards.map((c, i) => `
+    <div class="mkt-card ${c.rarity}" style="animation-delay:${Math.min(i,20)*0.035}s" onclick="openMktModal('${c.id}')">
+      <div class="mkt-stripe"></div>
+      <div class="mkt-holo"></div>
+      ${c.owned ? `<div class="mkt-owned-badge">✓ Possédée</div>` : ''}
+      <div class="mkt-stock">×${c.stock}</div>
+      <div class="mkt-card-art" style="background:${c.bg}">${c.emoji}</div>
+      <div class="mkt-card-body">
+        <div class="mkt-group">${c.group}</div>
+        <div class="mkt-name">${c.name}</div>
+        <div class="mkt-badge">${RARITY_ICONS[c.rarity]} ${RARITY_LABELS[c.rarity]}</div>
+        <div class="mkt-price-row">
+          <div>
+            <div class="mkt-price">${priceDisplay(c)}</div>
+            <div class="mkt-price-sub">${c.concept}</div>
+          </div>
+          <button class="mkt-buy-btn" onclick="event.stopPropagation();quickBuy('${c.id}')">${btnLabel}</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ─── MODAL DÉTAIL ───
+function openMktModal(id) {
+  selectedMktCard = MARKET_CARDS.find(c => c.id === id);
+  if (!selectedMktCard) return;
+  const c = selectedMktCard;
+  selectedMktCurrency = 'kkd';
+
+  document.getElementById('mktModalArt').style.background = c.bg;
+  document.getElementById('mktModalArt').textContent = c.emoji;
+  document.getElementById('mktModalGroup').textContent = c.group;
+  document.getElementById('mktModalName').textContent = c.name;
+  document.getElementById('mktModalConcept').textContent = `${c.concept} · ${RARITY_LABELS[c.rarity]} · Stock: ×${c.stock}`;
+  document.getElementById('mktKkdPrice').textContent = `${c.kkd.toLocaleString()} KKD`;
+  document.getElementById('mktEurPrice').textContent = `${c.eur} €`;
+  updateMktConfirmBtn();
+  document.getElementById('mktModal').classList.add('active');
+}
+
+function selectMktCurrency(cur) {
+  selectedMktCurrency = cur;
+  document.querySelector('.kkd-opt').style.opacity = cur === 'kkd' ? '1' : '0.5';
+  document.querySelector('.eur-opt').style.opacity = cur === 'eur' ? '1' : '0.5';
+  updateMktConfirmBtn();
+}
+
+function updateMktConfirmBtn() {
+  const btn = document.getElementById('mktConfirmBtn');
+  if (selectedMktCurrency === 'kkd') {
+    btn.textContent = `🪙 Acheter pour ${selectedMktCard?.kkd.toLocaleString()} KKD`;
+    btn.className = 'mkt-confirm-btn kkd';
+  } else {
+    btn.textContent = `💳 Acheter pour ${selectedMktCard?.eur} €`;
+    btn.className = 'mkt-confirm-btn eur';
+  }
+}
+
+async function confirmMktBuy() {
+  if (!selectedMktCard) return;
+  const c = selectedMktCard;
+  closeMktModal();
+
+  if (selectedMktCurrency === 'kkd') {
+    // Achat KKD
+    try {
+      if (window.KKD?.Auth.isLoggedIn()) {
+        KKD.UI.showLoader(`Achat de ${c.name} pour ${c.kkd} KKD...`);
+        // En prod : await KKD.ShopAPI.buyCard(c.id, 'kkd');
+        await new Promise(r => setTimeout(r, 1000)); // Simulation
+        KKD.UI.hideLoader();
+      }
+      showMarketToast(`✅ ${c.emoji} ${c.name} ajoutée à ta collection !`, 'success');
+      // Mettre à jour le badge "possédée"
+      const card = MARKET_CARDS.find(mc => mc.id === c.id);
+      if (card) { card.owned = true; card.stock--; }
+      filterMarket();
+    } catch(err) {
+      KKD.UI.hideLoader();
+      showMarketToast(err.message, 'error');
+    }
+  } else {
+    // Achat euros → Stripe
+    if (window.KKD?.Auth.isLoggedIn()) {
+      KKD.UI.showLoader('Redirection vers le paiement...');
+      await new Promise(r => setTimeout(r, 800));
+      KKD.UI.hideLoader();
+    }
+    showMarketToast(`Redirection vers le paiement pour ${c.name}...`, 'info');
+  }
+}
+
+function quickBuy(id) {
+  openMktModal(id);
+}
+
+function closeMktModal() {
+  document.getElementById('mktModal').classList.remove('active');
+}
+
+function showMarketToast(msg, type = 'success') {
+  if (window.KKD) { KKD.UI.toast(msg, type); return; }
+  const t = document.getElementById('toast');
+  if (t) { t.textContent = msg; t.className = `toast ${type} show`; setTimeout(()=>t.classList.remove('show'),3000); }
+}
+
+// ═══ COUNTDOWN ═══
+function updateCountdown() {
+  const el = document.getElementById('countdown');
+  if(!el) return;
+  const parts = el.textContent.split(':').map(Number);
+  let [h,m,s] = parts;
+  s--;
+  if(s<0){s=59;m--;}
+  if(m<0){m=59;h--;}
+  if(h<0){h=5;m=59;s=59;}
+  el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+setInterval(updateCountdown,1000);
+
+// ═══ INIT ═══
+renderPacks();
+renderBundles();
+renderCoins();
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closePayModal();closeMktModal();}});
+
+// ── CONNEXION BACKEND ──
+// Override processPayment pour utiliser Stripe réel
+async function processPayment() {
+  if (!window.KKD?.Auth.isLoggedIn()) {
+    closePayModal();
+    window.location.href = 'KpopKardDrop.html';
+    return;
+  }
+
+  const btn = document.querySelector('.pm-pay-btn');
+  btn.textContent = '⏳ Traitement en cours...';
+  btn.disabled = true;
+
+  try {
+    // Mapper le produit vers l'ID API
+    const productMap = {
+      'Pack Standard':   'booster_standard',
+      'Pack Rare':       'booster_rare',
+      'Pack Mythique':   'booster_mythic',
+      'Pack Légendaire': 'booster_legendary',
+      'Starter Bundle':  'bundle_starter',
+      'Collector Bundle':'bundle_collector',
+      'Legend Bundle':   'bundle_legend',
+      '500 KKD Coins':   'coins_500',
+      '1200 KKD Coins':  'coins_1200',
+      '2800 KKD Coins':  'coins_2800',
+      '6500 KKD Coins':  'coins_6500',
+    };
+    const productId = productMap[currentItem?.name];
+
+    if (productId) {
+      // Redirection vers Stripe Checkout (paiement réel)
+      await KKD.Stripe.redirectToCheckout(productId, currentQty);
+    } else {
+      // Fallback démo
+      setTimeout(() => {
+        document.getElementById('pmFormView').style.display = 'none';
+        document.getElementById('pmSuccess').classList.add('show');
+        btn.textContent = '🔒 Payer maintenant';
+        btn.disabled = false;
+      }, 1500);
+    }
+  } catch(err) {
+    KKD.UI.toast(err.message, 'error');
+    btn.textContent = '🔒 Payer maintenant';
+    btn.disabled = false;
+  }
+}
+
+// Afficher le solde KKD réel
+async function loadUserBalance() {
+  if (!window.KKD?.Auth.isLoggedIn()) return;
+  try {
+    const user = await KKD.AuthAPI.me();
+    const balEl = document.querySelector('.balance-amount');
+    const coinsAmountEl = document.querySelector('.coins-amount');
+    if (balEl) balEl.textContent = `🪙 ${user.kkdCoins?.toLocaleString() || 0}`;
+    if (coinsAmountEl) coinsAmountEl.textContent = `${user.kkdCoins?.toLocaleString() || 0} KKD`;
+  } catch {}
+}
+loadUserBalance();
+</script>
+<script src="api.js"></script>
+</body>
+</html>

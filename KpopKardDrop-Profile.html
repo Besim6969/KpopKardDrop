@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KpopKardDrop — Profil</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:#050508;--card-bg:#0f0f1c;--card-bg2:#13131f;
+    --neon-pink:#ff2d78;--neon-cyan:#00f5ff;--neon-gold:#ffd700;--neon-purple:#c77dff;
+    --common:#a0aec0;--rare:#63b3ed;--mythic:#c77dff;--legendary:#ffd700;
+    --text:#e8e8f0;--subtext:#6a6a90;--border:rgba(255,255,255,0.07);--green:#22c55e;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--black);color:var(--text);font-family:'Noto Sans KR',sans-serif;overflow-x:hidden}
+  .bg-grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(255,45,120,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,45,120,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+  .bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 50% 40% at 30% 10%,rgba(255,45,120,0.08) 0%,transparent 70%),radial-gradient(ellipse 40% 30% at 80% 80%,rgba(0,245,255,0.06) 0%,transparent 70%)}
+
+  /* SIDEBAR */
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:rgba(8,8,14,0.97);backdrop-filter:blur(20px);border-right:1px solid var(--border);z-index:100;display:flex;flex-direction:column;padding:28px 0}
+  .sidebar-logo{padding:0 24px 32px;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.1em;background:linear-gradient(90deg,var(--neon-pink),var(--neon-cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .sidebar-logo span{background:linear-gradient(90deg,var(--neon-cyan),var(--neon-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .nav-section-label{padding:0 24px 8px;font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--subtext)}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:11px 24px;color:var(--subtext);text-decoration:none;font-size:0.82rem;letter-spacing:0.05em;transition:all 0.2s;position:relative;cursor:pointer}
+  .nav-item:hover{color:var(--text);background:rgba(255,255,255,0.04)}
+  .nav-item.active{color:#fff;background:rgba(255,45,120,0.1)}
+  .nav-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--neon-pink)}
+  .nav-item .ni{font-size:1rem;width:20px;text-align:center}
+  .nav-divider{height:1px;background:var(--border);margin:12px 0}
+  .sidebar-footer{margin-top:auto;padding:16px 24px;border-top:1px solid var(--border)}
+  .user-chip{display:flex;align-items:center;gap:10px}
+  .user-avatar-sm{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--neon-pink),var(--neon-purple));display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:#000;flex-shrink:0;font-family:'Bebas Neue',sans-serif}
+  .user-name{font-size:0.8rem;color:var(--text)}
+  .user-rank{font-size:0.65rem;color:var(--subtext)}
+
+  /* MAIN LAYOUT */
+  .main{margin-left:220px;position:relative;z-index:1}
+
+  /* ── COVER BANNER ── */
+  .profile-cover{height:240px;position:relative;overflow:hidden}
+  .cover-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0a0020,#100030,#001020,#0a0015);animation:coverShift 8s ease-in-out infinite alternate}
+  @keyframes coverShift{0%{background-position:0% 50%}100%{background-position:100% 50%}}
+  .cover-particles{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+  .cp{position:absolute;border-radius:50%;animation:cpFloat linear infinite;opacity:0}
+  @keyframes cpFloat{0%{opacity:0;transform:translateY(0) scale(0)}20%{opacity:0.6}80%{opacity:0.2}100%{opacity:0;transform:translateY(-200px) scale(2)}}
+  .cover-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(5,5,8,0.95) 100%)}
+  .cover-edit-btn{position:absolute;top:16px;right:16px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);color:var(--subtext);padding:7px 16px;border-radius:8px;font-size:0.72rem;cursor:pointer;font-family:'Noto Sans KR',sans-serif;letter-spacing:0.08em;text-transform:uppercase;transition:all 0.2s;backdrop-filter:blur(8px)}
+  .cover-edit-btn:hover{border-color:var(--neon-cyan);color:var(--neon-cyan)}
+
+  /* ── PROFILE HEADER ── */
+  .profile-header{padding:0 48px 0;margin-top:-80px;position:relative;z-index:2;animation:fadeUp 0.5s ease both}
+  .ph-top{display:flex;align-items:flex-end;gap:24px;margin-bottom:20px}
+  .profile-avatar-wrap{position:relative;flex-shrink:0}
+  .profile-avatar{width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,var(--neon-pink),var(--neon-purple));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:3rem;color:#000;border:4px solid var(--black);box-shadow:0 0 30px rgba(255,45,120,0.4);position:relative;overflow:hidden}
+  .profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+  .profile-online-dot{position:absolute;bottom:6px;right:6px;width:16px;height:16px;border-radius:50%;border:3px solid var(--black)}
+  .profile-online-dot.online{background:var(--green);box-shadow:0 0 8px rgba(34,197,94,0.6)}
+  .profile-online-dot.offline{background:#4a4a6a}
+  .ph-info{flex:1;padding-bottom:8px}
+  .ph-name{font-family:'Black Han Sans',sans-serif;font-size:1.8rem;color:#fff;margin-bottom:4px;line-height:1}
+  .ph-handle{font-size:0.78rem;color:var(--subtext);margin-bottom:10px}
+  .ph-badges{display:flex;gap:6px;flex-wrap:wrap}
+  .ph-badge{padding:3px 10px;border-radius:100px;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700}
+  .ph-badge.legend{background:rgba(255,215,0,0.12);color:var(--legendary);border:1px solid rgba(255,215,0,0.3)}
+  .ph-badge.rank{background:rgba(0,245,255,0.1);color:var(--neon-cyan);border:1px solid rgba(0,245,255,0.25)}
+  .ph-badge.streak{background:rgba(255,120,0,0.1);color:#ff8800;border:1px solid rgba(255,120,0,0.25)}
+  .ph-badge.fan{background:rgba(255,45,120,0.1);color:var(--neon-pink);border:1px solid rgba(255,45,120,0.25)}
+  .ph-badge.new{background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.25)}
+  .ph-actions{display:flex;gap:10px;padding-bottom:8px}
+  .ph-btn{padding:10px 22px;border-radius:9px;font-family:'Noto Sans KR',sans-serif;font-size:0.78rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s}
+  .ph-btn.add{background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));color:#000;border:none;box-shadow:0 0 18px rgba(0,245,255,0.25)}
+  .ph-btn.add:hover{box-shadow:0 0 30px rgba(0,245,255,0.45);transform:translateY(-2px)}
+  .ph-btn.trade{background:transparent;border:1px solid rgba(255,215,0,0.35);color:var(--neon-gold)}
+  .ph-btn.trade:hover{background:rgba(255,215,0,0.08);border-color:rgba(255,215,0,0.6)}
+  .ph-btn.msg{background:transparent;border:1px solid var(--border);color:var(--subtext)}
+  .ph-btn.msg:hover{border-color:rgba(255,255,255,0.2);color:var(--text)}
+  .ph-btn.edit{background:transparent;border:1px solid var(--border);color:var(--subtext)}
+  .ph-btn.edit:hover{border-color:var(--neon-pink);color:var(--neon-pink)}
+
+  /* Bio */
+  .ph-bio{font-size:0.85rem;color:var(--subtext);line-height:1.6;margin-top:4px;max-width:600px}
+
+  /* ── STATS ROW ── */
+  .stats-row{display:flex;gap:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(8,8,14,0.6);backdrop-filter:blur(10px);margin:24px 0 0;animation:fadeUp 0.5s 0.05s ease both}
+  .stat-block{flex:1;padding:20px 0;text-align:center;border-right:1px solid var(--border);position:relative;cursor:pointer;transition:background 0.2s}
+  .stat-block:last-child{border-right:none}
+  .stat-block:hover{background:rgba(255,255,255,0.02)}
+  .stat-val{font-family:'Bebas Neue',sans-serif;font-size:2rem;line-height:1;margin-bottom:4px}
+  .stat-lbl{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--subtext)}
+  .stat-block.cards .stat-val{background:linear-gradient(135deg,var(--neon-pink),var(--neon-cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .stat-block.rank .stat-val{color:var(--neon-gold)}
+  .stat-block.trades .stat-val{color:var(--neon-cyan)}
+  .stat-block.streak .stat-val{color:#ff8800}
+  .stat-block.legendary .stat-val{color:var(--legendary)}
+  .stat-block.friends .stat-val{color:var(--neon-purple)}
+
+  /* ── CONTENT GRID ── */
+  .content-grid{display:grid;grid-template-columns:1fr 340px;gap:28px;padding:28px 48px 80px;animation:fadeUp 0.5s 0.1s ease both}
+
+  /* ── LEFT: COLLECTION ── */
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .section-title-sm{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.1em;color:rgba(255,255,255,0.45)}
+  .section-count{font-size:0.7rem;color:var(--subtext);letter-spacing:0.1em}
+
+  /* Collection filters */
+  .coll-filters{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+  .cf{padding:6px 14px;background:var(--card-bg);border:1px solid var(--border);border-radius:100px;font-size:0.7rem;color:var(--subtext);cursor:pointer;transition:all 0.2s;font-weight:700}
+  .cf:hover{border-color:rgba(255,255,255,0.15);color:var(--text)}
+  .cf.active{background:var(--neon-pink);border-color:transparent;color:#000}
+
+  /* Collection grid */
+  .coll-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px}
+  .pc{border-radius:12px;overflow:hidden;cursor:pointer;transition:transform 0.25s;animation:fadeUp 0.35s ease both}
+  .pc:hover{transform:translateY(-5px) scale(1.04)}
+  .pc.COMMON{background:linear-gradient(160deg,#1a2030,#2a3245);border:1px solid rgba(160,174,192,0.25)}
+  .pc.RARE{background:linear-gradient(160deg,#091626,#122040);border:1.5px solid rgba(99,179,237,0.55);box-shadow:0 3px 16px rgba(99,179,237,0.18)}
+  .pc.MYTHIC{background:linear-gradient(160deg,#130828,#22103e);border:2px solid rgba(199,125,255,0.65);box-shadow:0 4px 24px rgba(199,125,255,0.25)}
+  .pc.LEGENDARY{background:linear-gradient(160deg,#180e00,#2c1a00);border:2px solid rgba(255,215,0,0.75);box-shadow:0 6px 32px rgba(255,215,0,0.3)}
+  .pc-art{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:2.5rem}
+  .pc-info{padding:7px 8px 9px}
+  .pc-group{font-size:0.45rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--subtext);margin-bottom:1px}
+  .pc-name{font-family:'Black Han Sans',sans-serif;font-size:0.72rem;color:#fff}
+  .pc-badge{margin-top:4px;display:inline-flex;align-items:center;gap:2px;padding:1px 6px;border-radius:100px;font-size:0.42rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700}
+  .pc.COMMON .pc-badge{background:rgba(160,174,192,0.1);color:var(--common);border:1px solid rgba(160,174,192,0.18)}
+  .pc.RARE .pc-badge{background:rgba(99,179,237,0.1);color:var(--rare);border:1px solid rgba(99,179,237,0.28)}
+  .pc.MYTHIC .pc-badge{background:rgba(199,125,255,0.1);color:var(--mythic);border:1px solid rgba(199,125,255,0.32)}
+  .pc.LEGENDARY .pc-badge{background:rgba(255,215,0,0.1);color:var(--legendary);border:1px solid rgba(255,215,0,0.4);box-shadow:0 0 5px rgba(255,215,0,0.15)}
+  .pc-holo{position:absolute;inset:0;border-radius:12px;pointer-events:none}
+  .pc.MYTHIC .pc-holo{background:linear-gradient(105deg,transparent 30%,rgba(199,125,255,0.07) 50%,transparent 70%);animation:pcHolo 3s infinite}
+  .pc.LEGENDARY .pc-holo{background:linear-gradient(105deg,transparent 20%,rgba(255,215,0,0.09) 45%,transparent 70%);animation:pcHolo 2s infinite}
+  @keyframes pcHolo{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+
+  /* Load more */
+  .load-more-btn{width:100%;margin-top:20px;padding:12px;background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--subtext);font-family:'Noto Sans KR',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.08em;text-transform:uppercase}
+  .load-more-btn:hover{border-color:var(--neon-pink);color:var(--neon-pink)}
+
+  /* ── RIGHT PANEL ── */
+  .right-panel{display:flex;flex-direction:column;gap:20px}
+
+  /* Rarity breakdown */
+  .rarity-breakdown{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:20px}
+  .rb-title{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--subtext);margin-bottom:16px}
+  .rb-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .rb-row:last-child{margin-bottom:0}
+  .rb-icon{font-size:1rem;width:20px;text-align:center}
+  .rb-label{font-size:0.72rem;color:var(--subtext);width:75px;flex-shrink:0}
+  .rb-bar-track{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden}
+  .rb-bar-fill{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(0.34,1.1,0.64,1)}
+  .rb-row.common .rb-bar-fill{background:var(--common)}
+  .rb-row.rare .rb-bar-fill{background:var(--rare)}
+  .rb-row.mythic .rb-bar-fill{background:var(--mythic)}
+  .rb-row.legendary .rb-bar-fill{background:var(--legendary);box-shadow:0 0 6px rgba(255,215,0,0.4)}
+  .rb-count{font-family:'Bebas Neue',sans-serif;font-size:0.9rem;width:28px;text-align:right;flex-shrink:0}
+  .rb-row.common .rb-count{color:var(--common)}
+  .rb-row.rare .rb-count{color:var(--rare)}
+  .rb-row.mythic .rb-count{color:var(--mythic)}
+  .rb-row.legendary .rb-count{color:var(--legendary)}
+
+  /* Fav groups */
+  .fav-groups{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:20px}
+  .fg-title{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--subtext);margin-bottom:14px}
+  .fg-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+  .fg-item:last-child{border-bottom:none;padding-bottom:0}
+  .fg-rank{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--subtext);width:18px;flex-shrink:0}
+  .fg-rank.gold{color:var(--neon-gold)}
+  .fg-rank.silver{color:#c0c0c0}
+  .fg-rank.bronze{color:#cd7f32}
+  .fg-info{flex:1}
+  .fg-name{font-size:0.82rem;color:#fff;font-weight:700}
+  .fg-cards{font-size:0.62rem;color:var(--subtext)}
+  .fg-bar{width:50px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;flex-shrink:0}
+  .fg-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--neon-pink),var(--neon-purple))}
+
+  /* Recent activity */
+  .activity-card{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:20px}
+  .act-title{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--subtext);margin-bottom:14px}
+  .act-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+  .act-item:last-child{border-bottom:none;padding-bottom:0}
+  .act-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+  .act-info{flex:1}
+  .act-text{font-size:0.76rem;color:var(--text);line-height:1.4}
+  .act-time{font-size:0.6rem;color:var(--subtext);margin-top:2px}
+
+  /* Mutual friends */
+  .mutual-card{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:20px}
+  .mut-title{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--subtext);margin-bottom:14px}
+  .mut-avatars{display:flex;gap:-8px;margin-bottom:10px}
+  .mut-av{width:36px;height:36px;border-radius:50%;border:2px solid var(--card-bg);display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;color:#000;font-family:'Bebas Neue',sans-serif;margin-left:-8px;flex-shrink:0;box-shadow:0 0 0 1px rgba(255,255,255,0.1)}
+  .mut-av:first-child{margin-left:0}
+  .mut-text{font-size:0.75rem;color:var(--subtext)}
+  .mut-text b{color:var(--text)}
+
+  /* Toast */
+  .toast{position:fixed;bottom:28px;right:28px;padding:14px 20px;border-radius:10px;font-size:0.82rem;z-index:999;opacity:0;transform:translateY(16px);transition:all 0.3s;pointer-events:none;max-width:300px}
+  .toast.show{opacity:1;transform:translateY(0)}
+  .toast.success{background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:var(--green)}
+  .toast.info{background:rgba(0,245,255,0.1);border:1px solid rgba(0,245,255,0.25);color:var(--neon-cyan)}
+  .toast.gold{background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:var(--neon-gold)}
+  .toast.error{background:rgba(255,45,120,0.12);border:1px solid rgba(255,45,120,0.3);color:var(--neon-pink)}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @media(max-width:1100px){.content-grid{grid-template-columns:1fr}.right-panel{display:grid;grid-template-columns:1fr 1fr;gap:20px}}
+  @media(max-width:900px){.sidebar{display:none}.main{margin-left:0}.profile-header{padding:0 20px}.content-grid{padding:20px}.coll-grid{grid-template-columns:repeat(auto-fill,minmax(90px,1fr))}.ph-top{flex-wrap:wrap}.ph-actions{flex-wrap:wrap}.right-panel{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">KpopKard<span>Drop</span></div>
+  <div class="nav-section-label">Menu</div>
+  <a class="nav-item" href="KpopKardDrop.html"><span class="ni">🏠</span> Accueil</a>
+  <a class="nav-item" href="KpopKardDrop-Collection.html"><span class="ni">🃏</span> Ma Collection</a>
+  <a class="nav-item" href="KpopKardDrop-Shop.html"><span class="ni">🛍️</span> Boutique</a>
+  <div class="nav-divider"></div>
+  <div class="nav-section-label">Social</div>
+  <a class="nav-item" href="KpopKardDrop-Social.html"><span class="ni">👥</span> Amis & Tchat</a>
+  <a class="nav-item" href="KpopKardDrop-Rewards.html"><span class="ni">🎁</span> Récompenses</a>
+  <a class="nav-item" href="#"><span class="ni">🏆</span> Classement</a>
+  <div class="nav-divider"></div>
+  <div class="nav-section-label">Compte</div>
+  <a class="nav-item active" href="#"><span class="ni">👤</span> Profil</a>
+  <a class="nav-item" href="#"><span class="ni">⚙️</span> Paramètres</a>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="user-avatar-sm" id="sidebarAvatar">K</div>
+      <div><div class="user-name" id="sidebarName">KFan2026</div><div class="user-rank" id="sidebarRank">✦ Rang #142</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <!-- COVER -->
+  <div class="profile-cover">
+    <div class="cover-bg"></div>
+    <div class="cover-particles" id="coverParticles"></div>
+    <div class="cover-overlay"></div>
+    <button class="cover-edit-btn" id="coverEditBtn" style="display:none" onclick="showToast('Modification du profil bientôt disponible !','info')">✏️ Modifier le profil</button>
+  </div>
+
+  <!-- PROFILE HEADER -->
+  <div class="profile-header">
+    <div class="ph-top">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar" id="profileAvatar">K</div>
+        <div class="profile-online-dot online" id="onlineDot"></div>
+      </div>
+      <div class="ph-info">
+        <div class="ph-name" id="profileName">KFan2026</div>
+        <div class="ph-handle" id="profileHandle">@kfan2026 · Membre depuis janv. 2026</div>
+        <div class="ph-badges" id="profileBadges">
+          <div class="ph-badge legend">👑 Légende</div>
+          <div class="ph-badge rank">💎 Rang #142</div>
+          <div class="ph-badge streak">🔥 7 jours</div>
+          <div class="ph-badge fan">🌸 BTS Stan</div>
+        </div>
+      </div>
+      <div class="ph-actions" id="profileActions">
+        <!-- Rempli par JS selon si c'est son propre profil ou non -->
+      </div>
+    </div>
+    <div class="ph-bio" id="profileBio">Fan de K-pop depuis toujours 🎵 Collectionneur passionné · BTS · aespa · SEVENTEEN</div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="stats-row">
+    <div class="stat-block cards">
+      <div class="stat-val" id="statCards">21</div>
+      <div class="stat-lbl">Cartes</div>
+    </div>
+    <div class="stat-block legendary">
+      <div class="stat-val" id="statLegendary">2</div>
+      <div class="stat-lbl">Légendaires</div>
+    </div>
+    <div class="stat-block rank">
+      <div class="stat-val" id="statRank">#142</div>
+      <div class="stat-lbl">Classement</div>
+    </div>
+    <div class="stat-block trades">
+      <div class="stat-val" id="statTrades">8</div>
+      <div class="stat-lbl">Échanges</div>
+    </div>
+    <div class="stat-block streak">
+      <div class="stat-val" id="statStreak">7</div>
+      <div class="stat-lbl">Jours streak</div>
+    </div>
+    <div class="stat-block friends">
+      <div class="stat-val" id="statFriends">12</div>
+      <div class="stat-lbl">Amis</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content-grid">
+    <!-- LEFT: COLLECTION -->
+    <div>
+      <div class="section-header">
+        <div class="section-title-sm">COLLECTION</div>
+        <div class="section-count" id="collCount">21 cartes possédées</div>
+      </div>
+      <div class="coll-filters">
+        <div class="cf active" onclick="filterColl(this,'all')">Toutes</div>
+        <div class="cf" onclick="filterColl(this,'LEGENDARY')">👑 Légendaires</div>
+        <div class="cf" onclick="filterColl(this,'MYTHIC')">✨ Mythiques</div>
+        <div class="cf" onclick="filterColl(this,'RARE')">💎 Rares</div>
+        <div class="cf" onclick="filterColl(this,'COMMON')">🃏 Communes</div>
+      </div>
+      <div class="coll-grid" id="collGrid"></div>
+      <button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()">Voir plus de cartes ↓</button>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+      <!-- Rarity breakdown -->
+      <div class="rarity-breakdown">
+        <div class="rb-title">Répartition par rareté</div>
+        <div class="rb-row legendary">
+          <div class="rb-icon">👑</div>
+          <div class="rb-label">Légendaire</div>
+          <div class="rb-bar-track"><div class="rb-bar-fill" id="rbLegendary" style="width:0%"></div></div>
+          <div class="rb-count" id="rbLegendaryCount">0</div>
+        </div>
+        <div class="rb-row mythic">
+          <div class="rb-icon">✨</div>
+          <div class="rb-label">Mythique</div>
+          <div class="rb-bar-track"><div class="rb-bar-fill" id="rbMythic" style="width:0%"></div></div>
+          <div class="rb-count" id="rbMythicCount">0</div>
+        </div>
+        <div class="rb-row rare">
+          <div class="rb-icon">💎</div>
+          <div class="rb-label">Rare</div>
+          <div class="rb-bar-track"><div class="rb-bar-fill" id="rbRare" style="width:0%"></div></div>
+          <div class="rb-count" id="rbRareCount">0</div>
+        </div>
+        <div class="rb-row common">
+          <div class="rb-icon">🃏</div>
+          <div class="rb-label">Commune</div>
+          <div class="rb-bar-track"><div class="rb-bar-fill" id="rbCommon" style="width:0%"></div></div>
+          <div class="rb-count" id="rbCommonCount">0</div>
+        </div>
+      </div>
+
+      <!-- Groupes favoris -->
+      <div class="fav-groups">
+        <div class="fg-title">Top groupes</div>
+        <div id="favGroupsList"></div>
+      </div>
+
+      <!-- Activité récente -->
+      <div class="activity-card">
+        <div class="act-title">Activité récente</div>
+        <div id="activityList"></div>
+      </div>
+
+      <!-- Amis en commun -->
+      <div class="mutual-card" id="mutualCard">
+        <div class="mut-title">Amis en commun</div>
+        <div class="mut-avatars" id="mutAvatars"></div>
+        <div class="mut-text" id="mutText"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ MOCK DATA — remplacé par l'API en prod ═══
+const IS_OWN_PROFILE = !new URLSearchParams(location.search).get('user');
+const VIEWED_USER = new URLSearchParams(location.search).get('user') || 'KFan2026';
+
+const MOCK_COLLECTION = [
+  {id:'1',group:'BTS',name:'Jin',rarity:'LEGENDARY',emoji:'🌸',bg:'linear-gradient(160deg,#1a0020,#2e0040)',concept:'Solo Debut'},
+  {id:'2',group:'BIGBANG',name:'G-Dragon',rarity:'LEGENDARY',emoji:'👁',bg:'linear-gradient(160deg,#0a0015,#18003a)',concept:'Icon Edition'},
+  {id:'3',group:'aespa',name:'Karina',rarity:'MYTHIC',emoji:'🤖',bg:'linear-gradient(160deg,#0a0a1a,#15152e)',concept:'Concept Photo'},
+  {id:'4',group:'NewJeans',name:'Hanni',rarity:'MYTHIC',emoji:'🎀',bg:'linear-gradient(160deg,#0a001a,#15002e)',concept:'Collaboration'},
+  {id:'5',group:'TXT',name:'Yeonjun',rarity:'MYTHIC',emoji:'🦋',bg:'linear-gradient(160deg,#080018,#100028)',concept:'World Tour'},
+  {id:'6',group:'Stray Kids',name:'Felix',rarity:'RARE',emoji:'🔥',bg:'linear-gradient(160deg,#001018,#001828)',concept:'Stage Performance'},
+  {id:'7',group:'EXO',name:'Baekhyun',rarity:'RARE',emoji:'⭐',bg:'linear-gradient(160deg,#080818,#101028)',concept:'Music Video'},
+  {id:'8',group:'NCT',name:'Taeyong',rarity:'RARE',emoji:'🖤',bg:'linear-gradient(160deg,#050510,#0a0a20)',concept:'Award Show'},
+  {id:'9',group:'ENHYPEN',name:'Ni-ki',rarity:'RARE',emoji:'🌙',bg:'linear-gradient(160deg,#000818,#001028)',concept:'Magazine Cover'},
+  {id:'10',group:'IVE',name:'Wonyoung',rarity:'RARE',emoji:'🌺',bg:'linear-gradient(160deg,#001818,#002e2e)',concept:'Stage Performance'},
+  {id:'11',group:'LE SSERAFIM',name:'Kazuha',rarity:'RARE',emoji:'🍂',bg:'linear-gradient(160deg,#1a0800,#2e1500)',concept:'Music Video'},
+  {id:'12',group:'ITZY',name:'Yeji',rarity:'RARE',emoji:'🐱',bg:'linear-gradient(160deg,#100010,#200020)',concept:'Magazine Cover'},
+  {id:'13',group:'SEVENTEEN',name:'Woozi',rarity:'COMMON',emoji:'🎹',bg:'linear-gradient(160deg,#0a0a12,#141420)',concept:'Portrait Officiel'},
+  {id:'14',group:'GOT7',name:'BamBam',rarity:'COMMON',emoji:'💫',bg:'linear-gradient(160deg,#080810,#101018)',concept:'Behind The Scene'},
+  {id:'15',group:'MONSTA X',name:'Shownu',rarity:'COMMON',emoji:'💪',bg:'linear-gradient(160deg,#080808,#101010)',concept:'Fan Meet'},
+  {id:'16',group:'NMIXX',name:'Sullyoon',rarity:'COMMON',emoji:'🌊',bg:'linear-gradient(160deg,#000a10,#001018)',concept:'Daily Selca'},
+  {id:'17',group:'MAMAMOO',name:'Hwasa',rarity:'COMMON',emoji:'🔮',bg:'linear-gradient(160deg,#080008,#100010)',concept:'Portrait Officiel'},
+  {id:'18',group:'TWICE',name:'Nayeon',rarity:'MYTHIC',emoji:'🐰',bg:'linear-gradient(160deg,#001808,#002e12)',concept:'Collaboration'},
+  {id:'19',group:'Red Velvet',name:'Irene',rarity:'RARE',emoji:'🌹',bg:'linear-gradient(160deg,#1a0a0a,#2e1515)',concept:'Award Show'},
+  {id:'20',group:'BLACKPINK',name:'Jennie',rarity:'RARE',emoji:'🖤',bg:'linear-gradient(160deg,#1a0008,#300015)',concept:'Stage Performance'},
+  {id:'21',group:'SEVENTEEN',name:'Hoshi',rarity:'RARE',emoji:'🐯',bg:'linear-gradient(160deg,#080810,#101018)',concept:'Music Video'},
+];
+
+const MOCK_ACTIVITY = [
+  {icon:'🎴',text:'A ouvert un <b>Pack Mythique</b> et obtenu Karina',time:'Il y a 2h',bg:'linear-gradient(135deg,#150830,#200d48)'},
+  {icon:'🔄',text:'A échangé <b>Felix (Rare)</b> contre <b>Sana (Mythique)</b>',time:'Il y a 5h',bg:'linear-gradient(135deg,#001018,#002030)'},
+  {icon:'🎁',text:'A récupéré son <b>pack quotidien</b> — 1 Rare obtenu !',time:'Il y a 1j',bg:'linear-gradient(135deg,#0d1f35,#1a3550)'},
+  {icon:'👑',text:'A obtenu la carte <b>G-Dragon — Légendaire</b> !',time:'Il y a 2j',bg:'linear-gradient(135deg,#1a0a00,#2e1500)'},
+  {icon:'🏆',text:'A grimpé au <b>Rang #142</b> dans le classement',time:'Il y a 3j',bg:'linear-gradient(135deg,#100800,#1e1200)'},
+];
+
+const MOCK_GROUPS = [
+  {name:'BTS',cards:5,max:7},
+  {name:'aespa',cards:4,max:4},
+  {name:'SEVENTEEN',cards:3,max:13},
+  {name:'Stray Kids',cards:2,max:8},
+  {name:'EXO',cards:2,max:7},
+];
+
+const MUTUAL_FRIENDS = [
+  {name:'StarCollector',color:'linear-gradient(135deg,#ff2d78,#c77dff)'},
+  {name:'KpopQueen',color:'linear-gradient(135deg,#00f5ff,#c77dff)'},
+  {name:'IdolHunter',color:'linear-gradient(135deg,#00f5ff,#22c55e)'},
+];
+
+const RARITY_ICONS  = {COMMON:'🃏',RARE:'💎',MYTHIC:'✨',LEGENDARY:'👑'};
+const RARITY_LABELS = {COMMON:'Commune',RARE:'Rare',MYTHIC:'Mythique',LEGENDARY:'Légendaire'};
+
+let currentFilter = 'all';
+let showCount = 12;
+
+// ═══ INIT ═══
+function init() {
+  buildCoverParticles();
+  renderProfile();
+  renderCollection();
+  renderRarityBreakdown();
+  renderFavGroups();
+  renderActivity();
+  renderMutuals();
+}
+
+function buildCoverParticles() {
+  const c = document.getElementById('coverParticles');
+  const colors = ['#ff2d78','#00f5ff','#ffd700','#c77dff','#ff6eb4'];
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'cp';
+    p.style.cssText = `left:${Math.random()*100}%;bottom:0;width:${4+Math.random()*8}px;height:${4+Math.random()*8}px;background:${colors[i%colors.length]};animation-duration:${4+Math.random()*6}s;animation-delay:${Math.random()*5}s;border-radius:50%`;
+    c.appendChild(p);
+  }
+}
+
+function renderProfile() {
+  document.title = `KpopKardDrop — ${VIEWED_USER}`;
+
+  // Actions selon si c'est son propre profil
+  const actions = document.getElementById('profileActions');
+  if (IS_OWN_PROFILE) {
+    document.getElementById('coverEditBtn').style.display = 'block';
+    actions.innerHTML = `
+      <button class="ph-btn edit" onclick="showToast('Modification du profil bientôt disponible !','info')">✏️ Modifier</button>
+      <button class="ph-btn msg" onclick="window.location.href='KpopKardDrop-Rewards.html'">🎁 Récompenses</button>
+    `;
+  } else {
+    actions.innerHTML = `
+      <button class="ph-btn add" onclick="addFriend()">👥 Ajouter</button>
+      <button class="ph-btn trade" onclick="showToast('Propose un échange via le tchat !','gold')">🔄 Échanger</button>
+      <button class="ph-btn msg" onclick="window.location.href='KpopKardDrop-Social.html'">💬 Message</button>
+    `;
+    document.getElementById('mutualCard').style.display = 'block';
+  }
+}
+
+// ═══ COLLECTION ═══
+function filterColl(el, rarity) {
+  document.querySelectorAll('.cf').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentFilter = rarity;
+  showCount = 12;
+  renderCollection();
+}
+
+function renderCollection() {
+  const cards = currentFilter === 'all'
+    ? MOCK_COLLECTION
+    : MOCK_COLLECTION.filter(c => c.rarity === currentFilter);
+
+  const visible = cards.slice(0, showCount);
+  document.getElementById('collCount').textContent = `${MOCK_COLLECTION.length} cartes possédées`;
+  document.getElementById('loadMoreBtn').style.display = cards.length > showCount ? 'block' : 'none';
+
+  document.getElementById('collGrid').innerHTML = visible.map((c, i) => `
+    <div class="pc ${c.rarity}" style="animation-delay:${Math.min(i,16)*0.04}s;position:relative" title="${c.name} — ${c.concept}">
+      <div class="pc-holo"></div>
+      <div class="pc-art" style="background:${c.bg}">${c.emoji}</div>
+      <div class="pc-info">
+        <div class="pc-group">${c.group}</div>
+        <div class="pc-name">${c.name}</div>
+        <div class="pc-badge">${RARITY_ICONS[c.rarity]} ${RARITY_LABELS[c.rarity]}</div>
+      </div>
+    </div>`).join('');
+}
+
+function loadMore() {
+  showCount += 12;
+  renderCollection();
+}
+
+// ═══ RARITY BREAKDOWN ═══
+function renderRarityBreakdown() {
+  const counts = {LEGENDARY:0,MYTHIC:0,RARE:0,COMMON:0};
+  MOCK_COLLECTION.forEach(c => counts[c.rarity]++);
+  const total = MOCK_COLLECTION.length;
+
+  const set = (id, countId, count, total) => {
+    setTimeout(() => {
+      document.getElementById(id).style.width = `${count/total*100}%`;
+      document.getElementById(countId).textContent = count;
+    }, 300);
+  };
+
+  set('rbLegendary','rbLegendaryCount', counts.LEGENDARY, total);
+  set('rbMythic',   'rbMythicCount',    counts.MYTHIC,    total);
+  set('rbRare',     'rbRareCount',      counts.RARE,      total);
+  set('rbCommon',   'rbCommonCount',    counts.COMMON,    total);
+
+  // Stats header
+  document.getElementById('statCards').textContent     = total;
+  document.getElementById('statLegendary').textContent = counts.LEGENDARY;
+}
+
+// ═══ FAV GROUPS ═══
+function renderFavGroups() {
+  const ranks = ['gold','silver','bronze','',''];
+  document.getElementById('favGroupsList').innerHTML = MOCK_GROUPS.map((g, i) => `
+    <div class="fg-item">
+      <div class="fg-rank ${ranks[i]}">${i+1}</div>
+      <div class="fg-info">
+        <div class="fg-name">${g.name}</div>
+        <div class="fg-cards">${g.cards} carte${g.cards>1?'s':''}</div>
+      </div>
+      <div class="fg-bar"><div class="fg-fill" style="width:${g.cards/g.max*100}%"></div></div>
+    </div>`).join('');
+}
+
+// ═══ ACTIVITY ═══
+function renderActivity() {
+  document.getElementById('activityList').innerHTML = MOCK_ACTIVITY.map(a => `
+    <div class="act-item">
+      <div class="act-icon" style="background:${a.bg}">${a.icon}</div>
+      <div class="act-info">
+        <div class="act-text">${a.text}</div>
+        <div class="act-time">${a.time}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══ MUTUAL FRIENDS ═══
+function renderMutuals() {
+  if (IS_OWN_PROFILE) { document.getElementById('mutualCard').style.display='none'; return; }
+  document.getElementById('mutAvatars').innerHTML = MUTUAL_FRIENDS.map(f => `
+    <div class="mut-av" style="background:${f.color}" title="${f.name}">${f.name[0]}</div>`).join('');
+  document.getElementById('mutText').innerHTML =
+    `<b>${MUTUAL_FRIENDS[0].name}</b>, <b>${MUTUAL_FRIENDS[1].name}</b> et ${MUTUAL_FRIENDS.length-2} autre(s) sont aussi amis avec ce joueur.`;
+}
+
+// ═══ ACTIONS ═══
+function addFriend() {
+  showToast('Demande d\'ami envoyée ! 💌','info');
+}
+
+// ═══ BACKEND ═══
+async function loadRealProfile() {
+  if (!window.KKD) { init(); return; }
+  try {
+    // Charger le profil depuis l'API
+    const user = await KKD.UsersAPI.getProfile(VIEWED_USER);
+    document.getElementById('profileName').textContent = user.username;
+    document.getElementById('profileHandle').textContent = `@${user.username} · Membre depuis ${new Date(user.createdAt).toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}`;
+    document.getElementById('profileAvatar').textContent = user.username[0].toUpperCase();
+    document.getElementById('statCards').textContent  = user._count?.collection || 0;
+    document.getElementById('statTrades').textContent = user._count?.tradesSent || 0;
+    document.getElementById('statRank').textContent   = `#${user.rank || '—'}`;
+    if (user.bio) document.getElementById('profileBio').textContent = user.bio;
+
+    // Sidebar
+    if (IS_OWN_PROFILE) {
+      document.getElementById('sidebarAvatar').textContent = user.username[0].toUpperCase();
+      document.getElementById('sidebarName').textContent   = user.username;
+      document.getElementById('sidebarRank').textContent   = `✦ Rang #${user.rank || '—'}`;
+    }
+  } catch { /* Fallback mock */ }
+  init();
+}
+
+// ═══ TOAST ═══
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent=msg; t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+loadRealProfile();
+</script>
+<script src="api.js"></script>
+</body>
+</html>
