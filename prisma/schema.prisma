@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  username         String    @unique
+  password         String
+  kkdCoins         Int       @default(0)
+  kardPoints       Int       @default(0)
+  totalKpEarned    Int       @default(0)
+  dailyStreak      Int       @default(0)
+  lastDailyReward  DateTime?
+  lastHourlyReward DateTime?
+  createdAt        DateTime  @default(now())
+  collection       UserCard[]
+  friendships1     Friendship[] @relation("user1")
+  friendships2     Friendship[] @relation("user2")
+  messages         Message[]
+  tradesSent       Trade[]   @relation("sender")
+  tradesReceived   Trade[]   @relation("receiver")
+  purchases        Purchase[]
+}
+
+model Card {
+  id          String   @id @default(cuid())
+  cardCode    String   @unique
+  name        String
+  groupName   String
+  generation  Int
+  rarity      String
+  emoji       String
+  bgColor     String
+  accentColor String
+  description String
+  imageUrl    String?
+  collection  UserCard[]
+}
+
+model UserCard {
+  id        String   @id @default(cuid())
+  userId    String
+  cardId    String
+  quantity  Int      @default(1)
+  favorite  Boolean  @default(false)
+  obtainedAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  card      Card     @relation(fields: [cardId], references: [id])
+  @@unique([userId, cardId])
+}
+
+model Friendship {
+  id        String    @id @default(cuid())
+  user1Id   String
+  user2Id   String
+  status    String    @default("pending")
+  createdAt DateTime  @default(now())
+  user1     User      @relation("user1", fields: [user1Id], references: [id])
+  user2     User      @relation("user2", fields: [user2Id], references: [id])
+  messages  Message[]
+}
+
+model Message {
+  id           String     @id @default(cuid())
+  friendshipId String
+  senderId     String
+  content      String
+  createdAt    DateTime   @default(now())
+  friendship   Friendship @relation(fields: [friendshipId], references: [id])
+  sender       User       @relation(fields: [senderId], references: [id])
+}
+
+model Trade {
+  id            String   @id @default(cuid())
+  senderId      String
+  receiverId    String
+  offeredCardId String
+  wantedCardId  String
+  status        String   @default("pending")
+  message       String?
+  createdAt     DateTime @default(now())
+  sender        User     @relation("sender", fields: [senderId], references: [id])
+  receiver      User     @relation("receiver", fields: [receiverId], references: [id])
+}
+
+model Purchase {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  amount    Int
+  currency  String   @default("eur")
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
